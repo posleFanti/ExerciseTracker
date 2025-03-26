@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.exercisetracker.BottomNavBar
 import com.exercisetracker.data.DoneWorkout
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
@@ -22,11 +23,10 @@ import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 fun LatestScreen(
     modifier: Modifier = Modifier
 ) {
-    val latestList = listOf(DoneWorkout(0, "Cardio", "01.03.2025", 1), DoneWorkout(1, "Power", "08.03.2025", 2))
     Scaffold (
         bottomBar = { BottomNavBar() }
     ) { innerPadding ->
-        Body(latestList, modifier.padding(innerPadding))
+        Body(listOf(), modifier.padding(innerPadding))
     }
 }
 
@@ -41,6 +41,7 @@ private fun Body(
                 text = "There is no workouts yet! Add one by using floating button",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
+                modifier = modifier.padding(10.dp)
             )
         } else {
             DoneList(
@@ -74,9 +75,11 @@ private fun DoneWorkoutItem(
     modifier: Modifier = Modifier
 ) {
    Row(
-       modifier.fillMaxWidth()
+       modifier = modifier.fillMaxWidth()
    ) {
-       Column {
+       Column(
+           modifier = modifier.padding(20.dp)
+       ) {
            Text(
                text = doneWorkout.date,
                style = MaterialTheme.typography.labelMedium
@@ -85,12 +88,35 @@ private fun DoneWorkoutItem(
                text = doneWorkout.type,
                style = MaterialTheme.typography.bodyLarge
            )
-           HorizontalDivider()
        }
    }
+    HorizontalDivider(
+        modifier = modifier.fillMaxWidth()
+    )
 }
 
-@Preview
+@Preview(showBackground = true)
+@Composable
+fun EmptyListTextPreview() {
+    ExerciseTrackerTheme {
+        Body(listOf())
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DoneListPreview() {
+    val doneList = listOf<DoneWorkout>(
+        DoneWorkout(0, "Cardio", "01.03.2025", 1),
+        DoneWorkout(1, "Power", "08.03.2025", 2),
+        DoneWorkout(2, "Legs", "14.03.2025", 3)
+    )
+    ExerciseTrackerTheme {
+        DoneList(doneList)
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 fun DoneWorkoutItemPreview() {
     ExerciseTrackerTheme {

@@ -16,8 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
 @Composable
 fun TrackerApp(navController: NavHostController = rememberNavController()) {
@@ -66,5 +68,13 @@ fun BottomNavBar() {
                 }
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BottomNavBarPreview() {
+    ExerciseTrackerTheme {
+        BottomNavBar()
     }
 }

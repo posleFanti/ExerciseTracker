@@ -83,7 +83,7 @@ private fun WorkoutItem(
 ) {
     ElevatedCard(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Row(
             modifier = modifier.padding(20.dp),
@@ -103,14 +103,26 @@ private fun WorkoutItem(
             Spacer(Modifier.weight(1f))
             Image(
                 painter = painterResource(R.drawable.cardio_icon),
-                contentDescription = "cardio_icon",
-
-                )
+                contentDescription = "cardio_icon"
+            )
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
+@Composable
+fun WorkoutListPreview() {
+    val list = listOf(
+        Workout(1, "Cardio"),
+        Workout(2, "Power"),
+        Workout(3, "Legs")
+    )
+    ExerciseTrackerTheme {
+        WorkoutList(list)
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 fun WorkoutItemPreview() {
     ExerciseTrackerTheme {
