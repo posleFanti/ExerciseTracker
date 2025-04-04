@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -85,29 +86,58 @@ private fun ExerciseList(
 @Composable
 private fun Exercise(exercise: Exercise, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.padding(10.dp)
+        modifier = modifier.padding(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
         Row(
-            modifier = modifier.fillMaxWidth().padding(10.dp)
+            modifier = modifier.fillMaxWidth()
         ) {
             Text(
                 text = exercise.name,
+                modifier = modifier.padding(10.dp)
+            )
+        }
+        HorizontalDivider(modifier = modifier.padding(horizontal = 10.dp))
+        Row {
+            Text(
+                text = "Подходы: ",
+                modifier = modifier.padding(start = 30.dp, top = 10.dp)
             )
             Spacer(modifier.weight(1f))
-            AttemptsList(exercise.attemptsList)
+            Text (
+                text = "Кол-во повторов:",
+                modifier = modifier.padding(end = 30.dp, top = 10.dp)
+            )
         }
+        AttemptsList(exercise.attemptsList, modifier)
     }
 }
 
 @Composable
-private fun AttemptsList(attemptsList: List<Int>) {
-    
+private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier) {
+    Column (
+        modifier = modifier.padding(10.dp),
+    ) {
+        attemptsList.forEachIndexed { index, item ->
+            Row {
+                Text(
+                    text = (index+1).toString(),
+                    modifier = modifier.padding(horizontal = 40.dp)
+                )
+                Spacer(modifier.weight(1f))
+                Text(
+                    text = item.toString(),
+                    modifier = modifier.padding(horizontal = 40.dp)
+                )
+            }
+        }
+    }
 }
 
 @Preview(showBackground=true)
 @Composable
 fun WorkoutDetailsPreview() {
-    val exerciseList = listOf<Exercise>(Exercise("Упражнение 1", listOf()), Exercise("Упражнение 2", listOf()))
+    val exerciseList = listOf<Exercise>(Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10)), Exercise("Упражнение 2", listOf(12, 10, 10, 10)))
     ExerciseTrackerTheme {
         WorkoutDetails(Workout(1, "Кардио", exerciseList))
     }
