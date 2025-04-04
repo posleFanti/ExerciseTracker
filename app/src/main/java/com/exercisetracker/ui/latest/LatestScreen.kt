@@ -38,10 +38,10 @@ private fun Body(
     Column {
         if (doneList.isEmpty()) {
             Text(
-                text = "There is no workouts yet! Add one by using floating button",
+                text = "Здесь пока нет тренировок! Добавьте одну, используя кнопку в углу экрана",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = modifier.padding(10.dp)
+                modifier = modifier.fillMaxWidth().padding(10.dp)
             )
         } else {
             DoneList(
@@ -107,9 +107,9 @@ fun EmptyListTextPreview() {
 @Composable
 fun DoneListPreview() {
     val doneList = listOf<DoneWorkout>(
-        DoneWorkout(0, "Cardio", "01.03.2025", 1),
-        DoneWorkout(1, "Power", "08.03.2025", 2),
-        DoneWorkout(2, "Legs", "14.03.2025", 3)
+        DoneWorkout(0, "Кардио", "01.03.2025", 1),
+        DoneWorkout(1, "Силовая", "08.03.2025", 2),
+        DoneWorkout(2, "Ноги", "14.03.2025", 3)
     )
     ExerciseTrackerTheme {
         DoneList(doneList)
@@ -120,6 +120,6 @@ fun DoneListPreview() {
 @Composable
 fun DoneWorkoutItemPreview() {
     ExerciseTrackerTheme {
-        DoneWorkoutItem(DoneWorkout(0, "Cardio", "01.03.2025", 1))
+        DoneWorkoutItem(DoneWorkout(0, "Кардио", "01.03.2025", 1))
     }
 }
