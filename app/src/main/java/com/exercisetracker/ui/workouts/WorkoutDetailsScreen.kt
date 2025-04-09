@@ -1,4 +1,4 @@
-package com.exercisetracker.ui.workoutdetails
+package com.exercisetracker.ui.workouts
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,7 +32,7 @@ fun WorkoutDetails(workout: Workout, modifier: Modifier = Modifier) {
     Scaffold (
         floatingActionButton = {
             FloatingActionButton(onClick = {}) {
-                Icon(Icons.Default.Edit, "FAB")
+                Icon(Icons.Default.Add, "Add")
             }
         }
     ) { innerPadding ->
