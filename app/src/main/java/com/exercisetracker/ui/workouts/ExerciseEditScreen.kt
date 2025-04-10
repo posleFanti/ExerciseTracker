@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.exercisetracker.ui.workouts
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,26 +22,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.Exercise
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
 @Composable
 fun ExerciseEditScreen(
     exercise: Exercise,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
+
 ) {
-    Column {
-        Text(
+    Scaffold(
+        topBar = { TopAppBar(
+            title = exercise.name,
+            canNavigateBack = true,
+            navigateUp = navigateBack
+        ) }
+    ) { innerPadding ->
+        Column {
+            /*Text(
             text = exercise.name,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineMedium,
             modifier = modifier.fillMaxWidth().padding(20.dp)
-        )
-        Text(
-            text = "Подходы: ",
-            modifier = modifier.padding(horizontal = 15.dp)
-        )
-        TextFieldsList(modifier, exercise.attemptsList)
+        )*/
+            Text(
+                text = "Подходы: ",
+                modifier = modifier.padding(innerPadding).padding(horizontal = 15.dp, vertical = 10.dp)
+            )
+            TextFieldsList(modifier, exercise.attemptsList)
+        }
     }
 }
 
@@ -87,7 +101,8 @@ private fun TextFieldsList(
 fun ExerciseEditPreview() {
     ExerciseTrackerTheme {
         ExerciseEditScreen(
-            Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10))
+            exercise = Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10)),
+            navigateBack = {}
         )
     }
 }

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.exercisetracker.ui.workouts
 
 import androidx.compose.foundation.Image
@@ -16,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,16 +40,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.exercisetracker.BottomNavBar
 import com.exercisetracker.R
+import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.Workout
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
 @Composable
 fun WorkoutScreen(
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     val workoutList = listOf(Workout(0, "Cardio"), Workout(2, "Power"))
     Scaffold (
+        topBar = { TopAppBar(
+            title = "Тренировки",
+            canNavigateBack = false,
+            navigateUp = navigateBack
+        ) },
         bottomBar = { BottomNavBar() },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {

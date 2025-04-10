@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.exercisetracker.ui.workouts
 
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -23,13 +26,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.Exercise
 import com.exercisetracker.data.Workout
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
 @Composable
-fun WorkoutDetails(workout: Workout, modifier: Modifier = Modifier) {
+fun WorkoutDetails(
+    workout: Workout,
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold (
+        topBar = {
+            TopAppBar(
+                title = "Тренировка " + workout.id,
+                canNavigateBack = true,
+                navigateUp = navigateBack
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = {}) {
                 Icon(Icons.Default.Add, "Add")
@@ -38,12 +53,12 @@ fun WorkoutDetails(workout: Workout, modifier: Modifier = Modifier) {
     ) { innerPadding ->
         val exerciseList = workout.exerciseList
         Column {
-            Text(
+            /*Text(
                 text = "Тренировка " + workout.id,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = modifier.fillMaxWidth().padding(20.dp)
-            )
+            )*/
             Body(exerciseList, modifier.padding(innerPadding))
         }
     }
@@ -140,7 +155,7 @@ private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier)
 fun WorkoutDetailsPreview() {
     val exerciseList = listOf<Exercise>(Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10)), Exercise("Упражнение 2", listOf(12, 10, 10, 10)))
     ExerciseTrackerTheme {
-        WorkoutDetails(Workout(1, "Кардио", exerciseList))
+        WorkoutDetails(Workout(1, "Кардио", exerciseList), {})
     }
 }
 
@@ -149,6 +164,6 @@ fun WorkoutDetailsPreview() {
 fun NoWorkoutDetailsPreview() {
     val exerciseList = listOf<Exercise>()
     ExerciseTrackerTheme {
-        WorkoutDetails(Workout(1, "Кардио", exerciseList))
+        WorkoutDetails(Workout(1, "Кардио", exerciseList), {})
     }
 }
