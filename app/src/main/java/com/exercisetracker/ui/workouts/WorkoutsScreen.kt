@@ -38,26 +38,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.exercisetracker.BottomNavBar
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.Workout
+import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+
+object WorkoutsDestination : NavigationDestination {
+    override val route = "workouts"
+    override val titleRes = R.string.workouts_title
+}
 
 @Composable
 fun WorkoutScreen(
-    navigateBack: () -> Unit,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     val workoutList = listOf(Workout(0, "Cardio"), Workout(2, "Power"))
     Scaffold (
         topBar = { TopAppBar(
-            title = "Тренировки",
+            title = R.string.workouts_title.toString(),
             canNavigateBack = false,
-            navigateUp = navigateBack
         ) },
-        bottomBar = { BottomNavBar() },
+        bottomBar = { BottomNavBar(navController) },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, "Add")
@@ -163,7 +171,9 @@ private fun WorkoutAddDialog(
                 text = "Добавить тренировку",
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
-                modifier = modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp)
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp)
             )
             OutlinedTextField(
                 value = "Название тренировки",

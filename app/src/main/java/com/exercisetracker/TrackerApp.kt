@@ -26,12 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.exercisetracker.ui.latest.LatestDestination
+import com.exercisetracker.ui.navigation.TrackerNavHost
+import com.exercisetracker.ui.stats.StatsDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+import com.exercisetracker.ui.workouts.WorkoutsDestination
 
 @Composable
 fun TrackerApp(navController: NavHostController = rememberNavController()) {
-
+    TrackerNavHost(navController)
 }
 
 @Composable
@@ -60,38 +65,43 @@ fun TopAppBar(
 }
 
 @Composable
-fun BottomNavBar() {
+fun BottomNavBar(
+    navController: NavHostController
+) {
     val items = listOf(
         BottomNavItem(
             title = "Последние",
+            route = LatestDestination.route,
             selectedIcon = Icons.Filled.DateRange,
             unselectedIcon = Icons.Outlined.DateRange
         ),
         BottomNavItem(
             title = "Тренировки",
+            route = WorkoutsDestination.route,
             selectedIcon = Icons.Filled.Face,
             unselectedIcon = Icons.Outlined.Face
         ),
         BottomNavItem(
             title = "Статистика",
+            route = StatsDestination.route,
             selectedIcon = Icons.Filled.Info,
             unselectedIcon = Icons.Outlined.Info
         )
     )
-    var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
+
+    val backStackEntry = navController.currentBackStackEntryAsState()
     NavigationBar {
-        items.forEachIndexed{index, item ->
+        items.forEachIndexed { index, item ->
+            val selected = item.route == backStackEntry.value?.destination?.route
             NavigationBarItem(
-                selected = index == selectedItemIndex,
-                onClick = { selectedItemIndex = index },
+                selected = selected,
+                onClick = { navController.navigate(item.route) },
                 label = {
                     Text(text = item.title)
                 },
                 icon = {
                     Icon(
-                        imageVector = if (index == selectedItemIndex) {
+                        imageVector = if (selected) {
                             item.selectedIcon
                         } else {
                             item.unselectedIcon
@@ -108,6 +118,6 @@ fun BottomNavBar() {
 @Composable
 fun BottomNavBarPreview() {
     ExerciseTrackerTheme {
-        BottomNavBar()
+        BottomNavBar(rememberNavController())
     }
 }

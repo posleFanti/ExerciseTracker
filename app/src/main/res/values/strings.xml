@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ExerciseTracker</string>
+    <string name="latest_title">Прошедшие тренировки</string>
+    <string name="workouts_title">Тренировки</string>
+    <string name="workout_details">Workout details</string>
+    <string name="stats_title">Статистика</string>
 </resources>

@@ -41,12 +41,6 @@ fun ExerciseEditScreen(
         ) }
     ) { innerPadding ->
         Column {
-            /*Text(
-            text = exercise.name,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = modifier.fillMaxWidth().padding(20.dp)
-        )*/
             Text(
                 text = "Подходы: ",
                 modifier = modifier.padding(innerPadding).padding(horizontal = 15.dp, vertical = 10.dp)

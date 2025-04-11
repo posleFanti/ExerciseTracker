@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,14 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.exercisetracker.BottomNavBar
+import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.DoneWorkout
+import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+
+object LatestDestination : NavigationDestination {
+    override val route = "latest"
+    override val titleRes = R.string.latest_title
+}
 
 @Composable
 fun LatestScreen(
-    navigateBack: () -> Unit,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     Scaffold (
@@ -33,10 +47,14 @@ fun LatestScreen(
             TopAppBar(
                 title = "Прошедшие тренировки",
                 canNavigateBack = false,
-                navigateUp = navigateBack
             )
         },
-        bottomBar = { BottomNavBar() }
+        floatingActionButton = {
+            FloatingActionButton(onClick = { }) {
+                Icon(Icons.Default.Add, "Add")
+            }
+        },
+        bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
         Body(listOf(), modifier.padding(innerPadding))
     }
@@ -53,7 +71,9 @@ private fun Body(
                 text = "Здесь пока нет тренировок! Добавьте одну, используя кнопку в углу экрана",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = modifier.fillMaxWidth().padding(10.dp)
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
             )
         } else {
             DoneList(

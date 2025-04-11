@@ -26,10 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.Exercise
 import com.exercisetracker.data.Workout
+import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+
+object WorkoutDetailsDestination : NavigationDestination {
+    override val route = "workout_details"
+    override val titleRes = R.string.workout_details
+}
 
 @Composable
 fun WorkoutDetails(
@@ -53,12 +60,6 @@ fun WorkoutDetails(
     ) { innerPadding ->
         val exerciseList = workout.exerciseList
         Column {
-            /*Text(
-                text = "Тренировка " + workout.id,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = modifier.fillMaxWidth().padding(20.dp)
-            )*/
             Body(exerciseList, modifier.padding(innerPadding))
         }
     }
