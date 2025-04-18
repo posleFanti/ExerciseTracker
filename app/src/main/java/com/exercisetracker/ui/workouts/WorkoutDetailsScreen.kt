@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +38,7 @@ object WorkoutDetailsDestination : NavigationDestination {
 }
 
 @Composable
-fun WorkoutDetails(
+fun WorkoutDetailsScreen(
     workout: Workout,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -156,7 +155,7 @@ private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier)
 fun WorkoutDetailsPreview() {
     val exerciseList = listOf<Exercise>(Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10)), Exercise("Упражнение 2", listOf(12, 10, 10, 10)))
     ExerciseTrackerTheme {
-        WorkoutDetails(Workout(1, "Кардио", exerciseList), {})
+        WorkoutDetailsScreen(Workout(1, "Кардио", exerciseList), {})
     }
 }
 
@@ -165,6 +164,6 @@ fun WorkoutDetailsPreview() {
 fun NoWorkoutDetailsPreview() {
     val exerciseList = listOf<Exercise>()
     ExerciseTrackerTheme {
-        WorkoutDetails(Workout(1, "Кардио", exerciseList), {})
+        WorkoutDetailsScreen(Workout(1, "Кардио", exerciseList), {})
     }
 }

@@ -29,6 +29,7 @@ import com.exercisetracker.BottomNavBar
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.DoneWorkout
+import com.exercisetracker.data.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
@@ -54,7 +55,6 @@ fun LatestScreen(
                 Icon(Icons.Default.Add, "Add")
             }
         },
-        bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
         Body(listOf(), modifier.padding(innerPadding))
     }
@@ -117,7 +117,7 @@ private fun DoneWorkoutItem(
                style = MaterialTheme.typography.labelMedium
            )
            Text(
-               text = doneWorkout.type,
+               text = doneWorkout.workout.type,
                style = MaterialTheme.typography.bodyLarge
            )
        }
@@ -139,9 +139,9 @@ fun EmptyListTextPreview() {
 @Composable
 fun DoneListPreview() {
     val doneList = listOf<DoneWorkout>(
-        DoneWorkout(0, "Кардио", "01.03.2025", 1),
-        DoneWorkout(1, "Силовая", "08.03.2025", 2),
-        DoneWorkout(2, "Ноги", "14.03.2025", 3)
+        DoneWorkout(0, "01.03.2025", Workout(1, "Кардио")),
+        DoneWorkout(1, "08.03.2025", Workout(2, "Силовая")),
+        DoneWorkout(2, "14.03.2025", Workout(3, "Ноги"))
     )
     ExerciseTrackerTheme {
         DoneList(doneList)
@@ -152,6 +152,6 @@ fun DoneListPreview() {
 @Composable
 fun DoneWorkoutItemPreview() {
     ExerciseTrackerTheme {
-        DoneWorkoutItem(DoneWorkout(0, "Кардио", "01.03.2025", 1))
+        DoneWorkoutItem(DoneWorkout(0, "01.03.2025", Workout(1, "Силовая")))
     }
 }

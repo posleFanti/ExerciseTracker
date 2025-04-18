@@ -22,7 +22,7 @@ fun StatsScreen(
     navController: NavHostController
 ){
     Scaffold (
-        bottomBar = { BottomNavBar(navController) }
+        //bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
         Text(text = "Not implemented yet!", modifier = Modifier.padding(innerPadding))
     }
