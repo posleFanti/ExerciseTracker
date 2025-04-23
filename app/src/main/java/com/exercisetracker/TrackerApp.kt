@@ -39,7 +39,14 @@ import com.exercisetracker.ui.workouts.WorkoutsDestination
 @Composable
 fun TrackerApp(navController: NavHostController = rememberNavController()) {
     Scaffold (
-        bottomBar = { BottomNavBar(navController) }
+        bottomBar = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+            if (currentRoute in listOf(WorkoutsDestination.route, LatestDestination.route,
+                    StatsDestination.route)) {
+                BottomNavBar(navController)
+            }
+        }
     ) { innerPadding ->
         TrackerNavHost(navController, Modifier.padding(innerPadding))
     }

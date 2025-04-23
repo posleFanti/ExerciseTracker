@@ -4,4 +4,5 @@ data class DoneWorkout(
     val id: Int = 0,
     val date: String,
     val workout: Workout,
+    val weightsList: List<Int> = listOf()
 )

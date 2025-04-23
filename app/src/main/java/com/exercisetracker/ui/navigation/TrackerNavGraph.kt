@@ -5,9 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.exercisetracker.data.DoneWorkout
 import com.exercisetracker.data.Exercise
 import com.exercisetracker.data.Workout
 import com.exercisetracker.ui.latest.LatestDestination
+import com.exercisetracker.ui.latest.LatestEditScreen
 import com.exercisetracker.ui.latest.LatestScreen
 import com.exercisetracker.ui.stats.StatsDestination
 import com.exercisetracker.ui.stats.StatsScreen
@@ -29,19 +31,30 @@ fun TrackerNavHost (
         modifier = modifier
     ) {
         composable(route = LatestDestination.route) {
-            LatestScreen(navController)
+            LatestScreen(
+                toDoneWorkoutDetails = { navController.navigate(LatestEditScreen.route) }
+            )
         }
         composable(route = WorkoutsDestination.route) {
-            WorkoutScreen(navController)
+            WorkoutScreen(
+                toWorkoutDetails = { navController.navigate(WorkoutDetailsDestination.route) }
+            )
         }
         composable(route = StatsDestination.route) {
-            StatsScreen(navController)
+            StatsScreen()
         }
         composable(route = ExerciseEditDestination.route) {
             ExerciseEditScreen(Exercise("Упражнение", listOf()), modifier) { navController.popBackStack() }
         }
         composable(route = WorkoutDetailsDestination.route) {
             WorkoutDetailsScreen(Workout(1, "Кардио", listOf()), { navController.popBackStack() })
+        }
+        composable(route = LatestEditScreen.route) {
+            LatestEditScreen(
+                doneWorkout = DoneWorkout(1, "10.01.2025", Workout(1, "Кардио", listOf())),
+                navigateBack = { navController.popBackStack() },
+                modifier = modifier
+            )
         }
     }
 }

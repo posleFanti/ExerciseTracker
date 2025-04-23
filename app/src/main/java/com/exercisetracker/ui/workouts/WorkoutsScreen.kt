@@ -56,7 +56,7 @@ object WorkoutsDestination : NavigationDestination {
 
 @Composable
 fun WorkoutScreen(
-    navController: NavHostController,
+    toWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
@@ -72,7 +72,7 @@ fun WorkoutScreen(
             }
         }
     ) { innerPadding ->
-        Body(workoutList, toWorkoutDetails = { navController.navigate(WorkoutDetailsDestination) }, modifier = modifier.padding(innerPadding))
+        Body(workoutList, toWorkoutDetails = toWorkoutDetails, modifier = modifier.padding(innerPadding))
     }
 
     if (showAddDialog)
@@ -130,8 +130,8 @@ private fun WorkoutItem(
 ) {
     ElevatedCard(
         modifier = modifier,
-        onClick = { toWorkoutDetails },
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        onClick = toWorkoutDetails
     ) {
         Row(
             modifier = modifier.padding(20.dp),

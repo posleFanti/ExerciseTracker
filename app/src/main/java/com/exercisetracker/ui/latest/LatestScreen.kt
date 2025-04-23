@@ -2,8 +2,10 @@
 
 package com.exercisetracker.ui.latest
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +42,7 @@ object LatestDestination : NavigationDestination {
 
 @Composable
 fun LatestScreen(
-    navController: NavHostController,
+    toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold (
@@ -56,13 +58,15 @@ fun LatestScreen(
             }
         },
     ) { innerPadding ->
-        Body(listOf(), modifier.padding(innerPadding))
+        val latestList = listOf(DoneWorkout(0, "10.01.2025", Workout(1, "Кардио", listOf())), DoneWorkout(1, "18.01.2025", Workout(2, "Силовая", listOf())))
+        Body(latestList, toDoneWorkoutDetails, modifier.padding(innerPadding))
     }
 }
 
 @Composable
 private fun Body(
     doneList: List<DoneWorkout>,
+    toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -71,13 +75,14 @@ private fun Body(
                 text = "Здесь пока нет тренировок! Добавьте одну, используя кнопку в углу экрана",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
             )
         } else {
             DoneList(
                 doneList,
+                toDoneWorkoutDetails,
                 modifier
             )
         }
@@ -87,6 +92,7 @@ private fun Body(
 @Composable
 private fun DoneList(
     doneList: List<DoneWorkout>,
+    toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn (
@@ -95,7 +101,8 @@ private fun DoneList(
         items(items = doneList, key = {it.id}) { item ->
             DoneWorkoutItem(
                 doneWorkout = item,
-                modifier = modifier
+                toDoneWorkoutDetails = toDoneWorkoutDetails,
+                modifier = Modifier
             )
         }
     }
@@ -104,10 +111,13 @@ private fun DoneList(
 @Composable
 private fun DoneWorkoutItem(
     doneWorkout: DoneWorkout,
+    toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
    Row(
-       modifier = modifier.fillMaxWidth()
+       modifier = modifier.fillMaxWidth().clickable(
+           onClick = toDoneWorkoutDetails
+       ),
    ) {
        Column(
            modifier = modifier.padding(20.dp)
@@ -131,7 +141,7 @@ private fun DoneWorkoutItem(
 @Composable
 fun EmptyListTextPreview() {
     ExerciseTrackerTheme {
-        Body(listOf())
+        Body(listOf(), {})
     }
 }
 
@@ -144,7 +154,7 @@ fun DoneListPreview() {
         DoneWorkout(2, "14.03.2025", Workout(3, "Ноги"))
     )
     ExerciseTrackerTheme {
-        DoneList(doneList)
+        DoneList(doneList, {})
     }
 }
 
@@ -152,6 +162,14 @@ fun DoneListPreview() {
 @Composable
 fun DoneWorkoutItemPreview() {
     ExerciseTrackerTheme {
-        DoneWorkoutItem(DoneWorkout(0, "01.03.2025", Workout(1, "Силовая")))
+        DoneWorkoutItem(DoneWorkout(0, "01.03.2025", Workout(1, "Силовая")), {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DoneWorkoutScreenPreview() {
+    ExerciseTrackerTheme {
+        LatestScreen({})
     }
 }
