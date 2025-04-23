@@ -5,4 +5,5 @@
     <string name="workout_details">Workout details</string>
     <string name="stats_title">Статистика</string>
     <string name="latest_edit_title">Недавняя тренировка</string>
+    <string name="exercise_edit_title">Редактирование упражнения</string>
 </resources>

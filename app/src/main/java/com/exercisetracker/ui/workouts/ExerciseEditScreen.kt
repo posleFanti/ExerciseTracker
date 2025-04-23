@@ -22,16 +22,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.Exercise
+import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+
+object ExerciseEditDestination : NavigationDestination {
+    override val route = "exercise_edit"
+    override val titleRes = R.string.exercise_edit_title
+}
 
 @Composable
 fun ExerciseEditScreen(
     exercise: Exercise,
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
-
 ) {
     Scaffold(
         topBar = { TopAppBar(
@@ -43,7 +49,9 @@ fun ExerciseEditScreen(
         Column {
             Text(
                 text = "Подходы: ",
-                modifier = modifier.padding(innerPadding).padding(horizontal = 15.dp, vertical = 10.dp)
+                modifier = modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 15.dp, vertical = 10.dp)
             )
             TextFieldsList(modifier, exercise.attemptsList)
         }
@@ -60,7 +68,9 @@ private fun TextFieldsList(
     ) {
         attemptsList.forEachIndexed { index, item ->
             Row (
-                modifier = modifier.fillMaxWidth().padding(horizontal = 15.dp)
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
             ) {
                 Text(
                     text = index.toString(),

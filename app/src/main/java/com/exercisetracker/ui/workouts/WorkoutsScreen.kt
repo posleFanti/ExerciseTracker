@@ -72,7 +72,7 @@ fun WorkoutScreen(
             }
         }
     ) { innerPadding ->
-        Body(workoutList, modifier = modifier.padding(innerPadding))
+        Body(workoutList, toWorkoutDetails = { navController.navigate(WorkoutDetailsDestination) }, modifier = modifier.padding(innerPadding))
     }
 
     if (showAddDialog)
@@ -82,6 +82,7 @@ fun WorkoutScreen(
 @Composable
 private fun Body(
     workoutList: List<Workout>,
+    toWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -94,6 +95,7 @@ private fun Body(
         } else {
             WorkoutList(
                 workoutList,
+                toWorkoutDetails,
                 modifier
             )
         }
@@ -103,6 +105,7 @@ private fun Body(
 @Composable
 private fun WorkoutList(
     workoutList: List<Workout>,
+    toWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -111,6 +114,7 @@ private fun WorkoutList(
         items(items = workoutList, key = { it.id }) { item ->
             WorkoutItem(
                 workout = item,
+                toWorkoutDetails = toWorkoutDetails,
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -121,10 +125,12 @@ private fun WorkoutList(
 @Composable
 private fun WorkoutItem(
     workout: Workout,
+    toWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier,
+        onClick = { toWorkoutDetails },
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Row(
@@ -215,7 +221,7 @@ fun WorkoutListPreview() {
         Workout(3, "Legs")
     )
     ExerciseTrackerTheme {
-        WorkoutList(list)
+        WorkoutList(list, {})
     }
 }
 
@@ -223,7 +229,7 @@ fun WorkoutListPreview() {
 @Composable
 fun WorkoutItemPreview() {
     ExerciseTrackerTheme {
-        WorkoutItem(Workout(1, "Cardio"))
+        WorkoutItem(Workout(1, "Cardio"), {})
     }
 }
 
