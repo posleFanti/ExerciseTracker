@@ -45,7 +45,7 @@ fun LatestScreen(
     toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = "Прошедшие тренировки",
@@ -58,7 +58,7 @@ fun LatestScreen(
             }
         },
     ) { innerPadding ->
-        val latestList = listOf(DoneWorkout(0, "10.01.2025", Workout(1, "Кардио", listOf())), DoneWorkout(1, "18.01.2025", Workout(2, "Силовая", listOf())))
+        val latestList = listOf(DoneWorkout(0, "10.01.2025", 1), DoneWorkout(1, "18.01.2025", 2))
         Body(latestList, toDoneWorkoutDetails, modifier.padding(innerPadding))
     }
 }
@@ -95,10 +95,10 @@ private fun DoneList(
     toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn (
+    LazyColumn(
         modifier = modifier
     ) {
-        items(items = doneList, key = {it.id}) { item ->
+        items(items = doneList, key = { it.id }) { item ->
             DoneWorkoutItem(
                 doneWorkout = item,
                 toDoneWorkoutDetails = toDoneWorkoutDetails,
@@ -114,24 +114,30 @@ private fun DoneWorkoutItem(
     toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-   Row(
-       modifier = modifier.fillMaxWidth().clickable(
-           onClick = toDoneWorkoutDetails
-       ),
-   ) {
-       Column(
-           modifier = modifier.padding(20.dp)
-       ) {
-           Text(
-               text = doneWorkout.date,
-               style = MaterialTheme.typography.labelMedium
-           )
-           Text(
-               text = doneWorkout.workout.type,
-               style = MaterialTheme.typography.bodyLarge
-           )
-       }
-   }
+    /* test lines, delete when database implemented */
+    val workoutList = listOf(Workout(1, "Кардио", listOf()), Workout(2, "Силовая", listOf()))
+    val workoutType = workoutList.get(doneWorkout.workoutId - 1).type
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                onClick = toDoneWorkoutDetails
+            ),
+    ) {
+        Column(
+            modifier = modifier.padding(20.dp)
+        ) {
+            Text(
+                text = doneWorkout.date,
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = workoutType,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
     HorizontalDivider(
         modifier = modifier.fillMaxWidth()
     )
@@ -149,9 +155,9 @@ fun EmptyListTextPreview() {
 @Composable
 fun DoneListPreview() {
     val doneList = listOf<DoneWorkout>(
-        DoneWorkout(0, "01.03.2025", Workout(1, "Кардио")),
-        DoneWorkout(1, "08.03.2025", Workout(2, "Силовая")),
-        DoneWorkout(2, "14.03.2025", Workout(3, "Ноги"))
+        DoneWorkout(0, "01.03.2025", 1),
+        DoneWorkout(1, "08.03.2025", 2),
+        DoneWorkout(2, "14.03.2025", 3)
     )
     ExerciseTrackerTheme {
         DoneList(doneList, {})
@@ -162,7 +168,7 @@ fun DoneListPreview() {
 @Composable
 fun DoneWorkoutItemPreview() {
     ExerciseTrackerTheme {
-        DoneWorkoutItem(DoneWorkout(0, "01.03.2025", Workout(1, "Силовая")), {})
+        DoneWorkoutItem(DoneWorkout(0, "01.03.2025", 1), {})
     }
 }
 

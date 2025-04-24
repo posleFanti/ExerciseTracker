@@ -51,7 +51,7 @@ fun TrackerNavHost (
         }
         composable(route = LatestEditScreen.route) {
             LatestEditScreen(
-                doneWorkout = DoneWorkout(1, "10.01.2025", Workout(1, "Кардио", listOf())),
+                doneWorkout = DoneWorkout(1, "10.01.2025", 1),
                 navigateBack = { navController.popBackStack() },
                 modifier = modifier
             )
