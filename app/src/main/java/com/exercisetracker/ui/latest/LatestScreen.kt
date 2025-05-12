@@ -2,10 +2,11 @@
 
 package com.exercisetracker.ui.latest
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,25 +25,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.exercisetracker.BottomNavBar
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
-import com.exercisetracker.data.DoneWorkout
-import com.exercisetracker.data.Workout
+import com.exercisetracker.data.entities.CompletedWorkout
+import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+import java.time.LocalDate
 
 object LatestDestination : NavigationDestination {
     override val route = "latest"
     override val titleRes = R.string.latest_title
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LatestScreen(
-    toDoneWorkoutDetails: () -> Unit,
+    toCompletedWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -58,19 +57,19 @@ fun LatestScreen(
             }
         },
     ) { innerPadding ->
-        val latestList = listOf(DoneWorkout(0, "10.01.2025", 1), DoneWorkout(1, "18.01.2025", 2))
-        Body(latestList, toDoneWorkoutDetails, modifier.padding(innerPadding))
+        val latestList = listOf(CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.now()), CompletedWorkout(completedWorkoutId = 2, workoutId = 2, date = LocalDate.of(2025, 10, 18)))
+        Body(latestList, toCompletedWorkoutDetails, modifier.padding(innerPadding))
     }
 }
 
 @Composable
 private fun Body(
-    doneList: List<DoneWorkout>,
-    toDoneWorkoutDetails: () -> Unit,
+    completedList: List<CompletedWorkout>,
+    toCompletedWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
-        if (doneList.isEmpty()) {
+        if (completedList.isEmpty()) {
             Text(
                 text = "Здесь пока нет тренировок! Добавьте одну, используя кнопку в углу экрана",
                 textAlign = TextAlign.Center,
@@ -80,9 +79,9 @@ private fun Body(
                     .padding(10.dp)
             )
         } else {
-            DoneList(
-                doneList,
-                toDoneWorkoutDetails,
+            CompletedWorkoutsList(
+                completedList,
+                toCompletedWorkoutDetails,
                 modifier
             )
         }
@@ -90,18 +89,18 @@ private fun Body(
 }
 
 @Composable
-private fun DoneList(
-    doneList: List<DoneWorkout>,
-    toDoneWorkoutDetails: () -> Unit,
+private fun CompletedWorkoutsList(
+    completedList: List<CompletedWorkout>,
+    toCompletedWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier
     ) {
-        items(items = doneList, key = { it.id }) { item ->
-            DoneWorkoutItem(
-                doneWorkout = item,
-                toDoneWorkoutDetails = toDoneWorkoutDetails,
+        items(items = completedList, key = { it.completedWorkoutId }) { item ->
+            CompletedWorkoutItem(
+                completedWorkout = item,
+                toDoneWorkoutDetails = toCompletedWorkoutDetails,
                 modifier = Modifier
             )
         }
@@ -109,14 +108,14 @@ private fun DoneList(
 }
 
 @Composable
-private fun DoneWorkoutItem(
-    doneWorkout: DoneWorkout,
+private fun CompletedWorkoutItem(
+    completedWorkout: CompletedWorkout,
     toDoneWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    /* test lines, delete when database implemented */
-    val workoutList = listOf(Workout(1, "Кардио", listOf()), Workout(2, "Силовая", listOf()))
-    val workoutType = workoutList.get(doneWorkout.workoutId - 1).type
+    /* test lines, delete when database and viewmodel implemented */
+    val workoutList = listOf(Workout(1, "Кардио"), Workout(2, "Силовая"))
+    val workoutType = workoutList[completedWorkout.workoutId.toInt() - 1].type
 
     Row(
         modifier = modifier
@@ -129,7 +128,7 @@ private fun DoneWorkoutItem(
             modifier = modifier.padding(20.dp)
         ) {
             Text(
-                text = doneWorkout.date,
+                text = completedWorkout.date.toString(),
                 style = MaterialTheme.typography.labelMedium
             )
             Text(
@@ -151,27 +150,30 @@ fun EmptyListTextPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun DoneListPreview() {
-    val doneList = listOf<DoneWorkout>(
-        DoneWorkout(0, "01.03.2025", 1),
-        DoneWorkout(1, "08.03.2025", 2),
-        DoneWorkout(2, "14.03.2025", 3)
+fun CompletedWorkoutListPreview() {
+    val completedList = listOf<CompletedWorkout>(
+        CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.of(2025, 5, 2)),
+        CompletedWorkout(completedWorkoutId = 2, workoutId = 2, date = LocalDate.of(2025, 5, 5)),
+        CompletedWorkout(completedWorkoutId = 3, workoutId = 3, date = LocalDate.of(2025, 5, 12))
     )
     ExerciseTrackerTheme {
-        DoneList(doneList, {})
+        CompletedWorkoutsList(completedList, {})
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun DoneWorkoutItemPreview() {
     ExerciseTrackerTheme {
-        DoneWorkoutItem(DoneWorkout(0, "01.03.2025", 1), {})
+        CompletedWorkoutItem(CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.of(2025, 5, 1)), {})
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun DoneWorkoutScreenPreview() {

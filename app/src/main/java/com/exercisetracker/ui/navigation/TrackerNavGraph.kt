@@ -1,13 +1,15 @@
 package com.exercisetracker.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.exercisetracker.data.DoneWorkout
-import com.exercisetracker.data.Exercise
-import com.exercisetracker.data.Workout
+import com.exercisetracker.data.entities.CompletedWorkout
+import com.exercisetracker.data.entities.Exercise
+import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.latest.LatestDestination
 import com.exercisetracker.ui.latest.LatestEditScreen
 import com.exercisetracker.ui.latest.LatestScreen
@@ -19,7 +21,9 @@ import com.exercisetracker.ui.workouts.WorkoutDetailsDestination
 import com.exercisetracker.ui.workouts.WorkoutDetailsScreen
 import com.exercisetracker.ui.workouts.WorkoutScreen
 import com.exercisetracker.ui.workouts.WorkoutsDestination
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TrackerNavHost (
     navController: NavHostController,
@@ -32,7 +36,7 @@ fun TrackerNavHost (
     ) {
         composable(route = LatestDestination.route) {
             LatestScreen(
-                toDoneWorkoutDetails = { navController.navigate(LatestEditScreen.route) }
+                toCompletedWorkoutDetails = { navController.navigate(LatestEditScreen.route) }
             )
         }
         composable(route = WorkoutsDestination.route) {
@@ -44,14 +48,14 @@ fun TrackerNavHost (
             StatsScreen()
         }
         composable(route = ExerciseEditDestination.route) {
-            ExerciseEditScreen(Exercise("Упражнение", listOf()), modifier) { navController.popBackStack() }
+            ExerciseEditScreen(Exercise(1, "Упражнение"), modifier) { navController.popBackStack() }
         }
         composable(route = WorkoutDetailsDestination.route) {
-            WorkoutDetailsScreen(Workout(1, "Кардио", listOf()), { navController.popBackStack() })
+            WorkoutDetailsScreen(Workout(1, "Кардио"), { navController.popBackStack() })
         }
         composable(route = LatestEditScreen.route) {
             LatestEditScreen(
-                doneWorkout = DoneWorkout(1, "10.01.2025", 1),
+                completedWorkout = CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.of(2025, 5, 7)),
                 navigateBack = { navController.popBackStack() },
                 modifier = modifier
             )

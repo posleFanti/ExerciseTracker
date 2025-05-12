@@ -1,5 +1,7 @@
 package com.exercisetracker.ui.latest
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,10 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
-import com.exercisetracker.data.DoneWorkout
-import com.exercisetracker.data.Workout
+import com.exercisetracker.data.entities.CompletedWorkout
+import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+import java.time.LocalDate
 
 object LatestEditScreen : NavigationDestination {
     override val route = "latest_edit"
@@ -25,7 +28,7 @@ object LatestEditScreen : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LatestEditScreen(
-    doneWorkout: DoneWorkout,
+    completedWorkout: CompletedWorkout,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -38,13 +41,13 @@ fun LatestEditScreen(
             ) },
         modifier = modifier
     ) { innerPadding ->
-        Body(doneWorkout, modifier.padding(innerPadding))
+        Body(completedWorkout, modifier.padding(innerPadding))
     }
 }
 
 @Composable
 private fun Body(
-    doneWorkout: DoneWorkout,
+    completedWorkout: CompletedWorkout,
     modifier: Modifier = Modifier
 ) {
     Column (
@@ -54,13 +57,13 @@ private fun Body(
             text = "Выполненные упражнения: ",
             modifier = Modifier.padding(16.dp)
         )
-        DoneExercisesList(doneWorkout, modifier)
+        DoneExercisesList(completedWorkout, modifier)
     }
 }
 
 @Composable
 private fun DoneExercisesList(
-    doneWorkout: DoneWorkout,
+    completedWorkout: CompletedWorkout,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -70,10 +73,11 @@ private fun DoneExercisesList(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun LatestEditScreenPreview() {
     ExerciseTrackerTheme {
-        LatestEditScreen(DoneWorkout(id = 1, date = "10.01.2025", workout = Workout(1, "Кардио")), {})
+        LatestEditScreen(CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.now()), {})
     }
 }

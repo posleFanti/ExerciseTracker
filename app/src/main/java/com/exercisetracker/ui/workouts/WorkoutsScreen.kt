@@ -39,13 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.exercisetracker.BottomNavBar
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
-import com.exercisetracker.data.Workout
+import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
