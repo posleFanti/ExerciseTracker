@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface WorkoutRepository {
     fun getAllWorkoutsStream(): Flow<List<Workout>>
-    fun getWorkoutStream(): Flow<Workout?>
-    fun getSetsForWorkout(workout: Workout): Flow<List<Set>>
+    fun getWorkoutStream(id: Long): Flow<Workout?>
+    fun getSetsForWorkout(id: Long): Flow<List<Set>>
     suspend fun insertWorkout(workout: Workout)
     suspend fun deleteWorkout(workout: Workout)
     suspend fun updateWorkout(workout: Workout)

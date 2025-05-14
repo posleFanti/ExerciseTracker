@@ -1,2 +1,45 @@
 package com.exercisetracker.ui.workouts
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.exercisetracker.TrackerApplication
+import com.exercisetracker.data.entities.Workout
+import com.exercisetracker.data.repositories.WorkoutRepository
+import com.exercisetracker.ui.latest.trackerApplication
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+
+class WorkoutsViewModel(
+    workoutRepository: WorkoutRepository
+) : ViewModel() {
+    val workoutsUiState: StateFlow<WorkoutsUiState> =
+        workoutRepository.getAllWorkoutsStream().map { WorkoutsUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = WorkoutsUiState()
+            )
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                WorkoutsViewModel(
+                    workoutRepository = trackerApplication().container.workoutRepository
+                )
+            }
+        }
+    }
+}
+
+data class WorkoutsUiState(val workoutList: List<Workout> = listOf())
+
+fun CreationExtras.trackerApplication(): TrackerApplication =
+    (this[AndroidViewModelFactory.APPLICATION_KEY] as TrackerApplication)

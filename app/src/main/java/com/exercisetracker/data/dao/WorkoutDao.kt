@@ -3,6 +3,7 @@ package com.exercisetracker.data.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.exercisetracker.data.entities.Workout
@@ -10,8 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WorkoutDao {
-    @Insert
-    suspend fun insert(workout: Workout): Long
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(workout: Workout)
 
     @Update
     suspend fun update(workout: Workout)
@@ -21,4 +22,7 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workouts ORDER BY workout_type ASC")
     fun getAllWorkouts(): Flow<List<Workout>>
+
+    @Query("SELECT * FROM workouts WHERE workout_id = :id ORDER BY workout_type ASC")
+    fun getWorkout(id: Long): Flow<Workout?>
 }

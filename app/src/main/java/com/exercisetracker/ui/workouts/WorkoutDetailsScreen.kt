@@ -46,7 +46,7 @@ fun WorkoutDetailsScreen(
     Scaffold (
         topBar = {
             TopAppBar(
-                title = "Тренировка " + workout.id,
+                title = "Тренировка " + workout.workoutId,
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
@@ -57,7 +57,7 @@ fun WorkoutDetailsScreen(
             }
         }
     ) { innerPadding ->
-        val exerciseList = workout.exerciseList
+        val exerciseList = listOf<Exercise>()
         Column {
             Body(exerciseList, modifier.padding(innerPadding))
         }
@@ -125,7 +125,7 @@ private fun Exercise(exercise: Exercise, modifier: Modifier = Modifier) {
                 modifier = modifier.padding(end = 30.dp, top = 10.dp)
             )
         }
-        AttemptsList(exercise.attemptsList, modifier)
+        AttemptsList(listOf(), modifier)
     }
 }
 
@@ -153,9 +153,9 @@ private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier)
 @Preview(showBackground=true)
 @Composable
 fun WorkoutDetailsPreview() {
-    val exerciseList = listOf<Exercise>(Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10)), Exercise("Упражнение 2", listOf(12, 10, 10, 10)))
+    val exerciseList = listOf<Exercise>(Exercise(1,"Упражнение 1"), Exercise(2, "Упражнение 2"))
     ExerciseTrackerTheme {
-        WorkoutDetailsScreen(Workout(1, "Кардио", exerciseList), {})
+        WorkoutDetailsScreen(Workout(1, "Кардио"), {})
     }
 }
 
@@ -164,6 +164,6 @@ fun WorkoutDetailsPreview() {
 fun NoWorkoutDetailsPreview() {
     val exerciseList = listOf<Exercise>()
     ExerciseTrackerTheme {
-        WorkoutDetailsScreen(Workout(1, "Кардио", exerciseList), {})
+        WorkoutDetailsScreen(Workout(1, "Кардио"), {})
     }
 }

@@ -41,4 +41,3 @@ data class CompletedSet(
     @ColumnInfo(name = "actual_reps")
     val actualReps: Int
 )
-)

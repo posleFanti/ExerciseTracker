@@ -52,7 +52,7 @@ fun ExerciseEditScreen(
                     .padding(innerPadding)
                     .padding(horizontal = 15.dp, vertical = 10.dp)
             )
-            TextFieldsList(modifier, exercise.attemptsList)
+            TextFieldsList(modifier, listOf())
         }
     }
 }
@@ -104,7 +104,7 @@ private fun TextFieldsList(
 fun ExerciseEditPreview() {
     ExerciseTrackerTheme {
         ExerciseEditScreen(
-            exercise = Exercise("Упражнение 1", listOf(15, 12, 10, 10, 10, 10)),
+            exercise = Exercise(1, "Упражнение 1"),
             navigateBack = {}
         )
     }

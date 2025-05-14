@@ -21,10 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.CompletedWorkout
@@ -32,6 +34,7 @@ import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 import java.time.LocalDate
+import androidx.compose.runtime.getValue
 
 object LatestDestination : NavigationDestination {
     override val route = "latest"
@@ -42,8 +45,11 @@ object LatestDestination : NavigationDestination {
 @Composable
 fun LatestScreen(
     toCompletedWorkoutDetails: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LatestViewModel = viewModel(factory = LatestViewModel.Factory)
 ) {
+    val latestUiState by viewModel.latestUiState.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,8 +63,11 @@ fun LatestScreen(
             }
         },
     ) { innerPadding ->
-        val latestList = listOf(CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.now()), CompletedWorkout(completedWorkoutId = 2, workoutId = 2, date = LocalDate.of(2025, 10, 18)))
-        Body(latestList, toCompletedWorkoutDetails, modifier.padding(innerPadding))
+        Body(
+            completedList = latestUiState.completedWorkoutsList,
+            toCompletedWorkoutDetails = toCompletedWorkoutDetails,
+            modifier = modifier.padding(innerPadding)
+        )
     }
 }
 
@@ -114,8 +123,8 @@ private fun CompletedWorkoutItem(
     modifier: Modifier = Modifier
 ) {
     /* test lines, delete when database and viewmodel implemented */
-    val workoutList = listOf(Workout(1, "Кардио"), Workout(2, "Силовая"))
-    val workoutType = workoutList[completedWorkout.workoutId.toInt() - 1].type
+    //val workoutList = listOf(Workout(1, "Кардио"), Workout(2, "Силовая"))
+    //val workoutType = workoutList[completedWorkout.workoutId.toInt() - 1].type
 
     Row(
         modifier = modifier
@@ -131,10 +140,10 @@ private fun CompletedWorkoutItem(
                 text = completedWorkout.date.toString(),
                 style = MaterialTheme.typography.labelMedium
             )
-            Text(
+            /*Text(
                 text = workoutType,
                 style = MaterialTheme.typography.bodyLarge
-            )
+            )*/
         }
     }
     HorizontalDivider(

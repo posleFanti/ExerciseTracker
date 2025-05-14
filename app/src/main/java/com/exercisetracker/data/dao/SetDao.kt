@@ -2,13 +2,14 @@ package com.exercisetracker.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import com.exercisetracker.data.entities.Set
 
 @Dao
 interface SetDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(set: Set): Long
 
     @Query("SELECT * FROM sets WHERE workout_id = :workoutId ORDER BY set_number ASC")

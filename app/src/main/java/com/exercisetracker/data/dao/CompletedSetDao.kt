@@ -2,12 +2,13 @@ package com.exercisetracker.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.exercisetracker.data.entities.CompletedSet
 
 @Dao
 interface CompletedSetDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(completedSet: CompletedSet): Long
 
     @Query("SELECT * FROM completed_sets WHERE completed_workout_id = :completedWorkoutId")
