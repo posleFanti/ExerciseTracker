@@ -5,8 +5,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.exercisetracker.data.entities.CompletedWorkout
 import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.data.entities.Workout
@@ -53,7 +55,12 @@ fun TrackerNavHost (
         composable(route = WorkoutDetailsDestination.route) {
             WorkoutDetailsScreen(Workout(1, "Кардио"), { navController.popBackStack() })
         }
-        composable(route = LatestEditScreen.route) {
+        composable(
+            route = LatestEditScreen.route,
+            arguments = listOf(navArgument(LatestEditScreen.completedWorkoutIdArg) {
+                type = NavType.LongType
+            })
+        ) {
             LatestEditScreen(
                 completedWorkout = CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.of(2025, 5, 7)),
                 navigateBack = { navController.popBackStack() },

@@ -59,7 +59,7 @@ fun WorkoutScreen(
     viewModel: WorkoutsViewModel = viewModel(factory = WorkoutsViewModel.Factory)
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
-    val workoutList = listOf(Workout(0, "Cardio"), Workout(2, "Power"))
+    //val workoutList = listOf(Workout(0, "Cardio"), Workout(2, "Power"))
     val workoutsUiState by viewModel.workoutsUiState.collectAsState()
 
     Scaffold (
@@ -73,11 +73,11 @@ fun WorkoutScreen(
             }
         }
     ) { innerPadding ->
-        Body(workoutList, toWorkoutDetails = toWorkoutDetails, modifier = modifier.padding(innerPadding))
+        Body(workoutsUiState.workoutList, toWorkoutDetails = toWorkoutDetails, modifier = modifier.padding(innerPadding))
     }
 
     if (showAddDialog)
-        WorkoutAddDialog(onDismissRequest = {}, modifier = modifier)
+        WorkoutAddDialog(onAcceptRequest = {}, onDismissRequest = {}, modifier = modifier)
 }
 
 @Composable
@@ -112,7 +112,7 @@ private fun WorkoutList(
     LazyColumn(
         modifier = modifier,
     ) {
-        items(items = workoutList, key = { it.id }) { item ->
+        items(items = workoutList, key = { it.workoutId }) { item ->
             WorkoutItem(
                 workout = item,
                 toWorkoutDetails = toWorkoutDetails,
@@ -141,7 +141,7 @@ private fun WorkoutItem(
         ) {
             Column {
                 Text(
-                    text = "Тренировка " + workout.id,
+                    text = "Тренировка " + workout.workoutId,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
@@ -161,6 +161,7 @@ private fun WorkoutItem(
 // TODO: Implement state changing
 @Composable
 private fun WorkoutAddDialog(
+    onAcceptRequest: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -238,6 +239,6 @@ fun WorkoutItemPreview() {
 @Composable
 fun WorkoutAddDialogPreview() {
     ExerciseTrackerTheme {
-        WorkoutAddDialog({})
+        WorkoutAddDialog({},{})
     }
 }
