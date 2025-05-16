@@ -30,7 +30,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.CompletedWorkout
-import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 import java.time.LocalDate
@@ -63,7 +62,7 @@ fun LatestScreen(
             }
         },
     ) { innerPadding ->
-        Body(
+        LatestEditScreenBody(
             completedList = latestUiState.completedWorkoutsList,
             toCompletedWorkoutDetails = toCompletedWorkoutDetails,
             modifier = modifier.padding(innerPadding)
@@ -72,7 +71,7 @@ fun LatestScreen(
 }
 
 @Composable
-private fun Body(
+private fun LatestEditScreenBody(
     completedList: List<CompletedWorkout>,
     toCompletedWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier
@@ -155,7 +154,7 @@ private fun CompletedWorkoutItem(
 @Composable
 fun EmptyListTextPreview() {
     ExerciseTrackerTheme {
-        Body(listOf(), {})
+        LatestEditScreenBody(listOf(), {})
     }
 }
 

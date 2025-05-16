@@ -1,10 +1,12 @@
 package com.exercisetracker.data.entities
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(
     tableName = "completed_sets",
@@ -40,4 +42,16 @@ data class CompletedSet(
 
     @ColumnInfo(name = "actual_reps")
     val actualReps: Int
+)
+
+data class CompletedSetWithSet(
+    @Embedded
+    val completedSet: CompletedSet,
+
+    @Relation(
+        parentColumn = "set_id",
+        entityColumn = "set_id",
+        entity = Set::class
+    )
+    val originalSet: Set
 )

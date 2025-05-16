@@ -1,7 +1,5 @@
 package com.exercisetracker.ui.latest
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,10 +11,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
-import com.exercisetracker.data.entities.CompletedWorkout
-import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 import java.time.LocalDate
@@ -31,9 +28,9 @@ object LatestEditScreen : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LatestEditScreen(
-    completedWorkout: CompletedWorkout,
     navigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LatestEditViewModel = viewModel(factory = LatestEditViewModel.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -46,13 +43,13 @@ fun LatestEditScreen(
             ) },
         modifier = modifier
     ) { innerPadding ->
-        Body(completedWorkout, modifier.padding(innerPadding))
+        LatestEditScreenBody(viewModel.latestEditUiState, modifier.padding(innerPadding))
     }
 }
 
 @Composable
-private fun Body(
-    completedWorkout: CompletedWorkout,
+private fun LatestEditScreenBody(
+    latestEditUiState: LatestEditUiState,
     modifier: Modifier = Modifier
 ) {
     Column (
@@ -62,13 +59,13 @@ private fun Body(
             text = "Выполненные упражнения: ",
             modifier = Modifier.padding(16.dp)
         )
-        DoneExercisesList(completedWorkout, modifier)
+        DoneExercisesList(latestEditUiState, modifier)
     }
 }
 
 @Composable
 private fun DoneExercisesList(
-    completedWorkout: CompletedWorkout,
+    latestEditUiState: LatestEditUiState,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -78,11 +75,17 @@ private fun DoneExercisesList(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun LatestEditScreenPreview() {
+fun BodyPreview() {
     ExerciseTrackerTheme {
-        LatestEditScreen(CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.now()), {})
+        LatestEditScreenBody(LatestEditUiState(
+            CompletedWorkoutWithSetsDetails(
+                completedWorkoutId = 0,
+                workoutId = 0,
+                date = LocalDate.of(2025, 1, 1),
+                completedSetsWithSets = listOf()
+            )
+        ))
     }
 }

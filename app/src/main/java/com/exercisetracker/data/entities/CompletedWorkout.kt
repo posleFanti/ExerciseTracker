@@ -1,10 +1,12 @@
 package com.exercisetracker.data.entities
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import java.time.LocalDate
 
 @Entity(
@@ -29,4 +31,16 @@ data class CompletedWorkout(
 
     @ColumnInfo(name = "workout_date")
     val date: LocalDate
+)
+
+data class CompletedWorkoutWithSets(
+    @Embedded
+    val completedWorkout: CompletedWorkout,
+
+    @Relation(
+        parentColumn = "completed_workout_id",
+        entityColumn = "completed_workout_id",
+        entity = CompletedSet::class
+    )
+    val completedSets: List<CompletedSetWithSet>
 )
