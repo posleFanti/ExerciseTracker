@@ -17,6 +17,9 @@ import com.exercisetracker.TopAppBar
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 import java.time.LocalDate
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import com.exercisetracker.data.entities.CompletedSetWithSet
 
 object LatestEditScreen : NavigationDestination {
     override val route = "latest_edit"
@@ -71,7 +74,20 @@ private fun DoneExercisesList(
     LazyColumn(
         modifier = modifier
     ) {
-        //TODO: Decide how to keep data about done exercises
+        items(items = latestEditUiState.completedWorkoutDetails.completedSetsWithSets, key = {it.originalSet}) { item ->
+            DoneExercise()
+        }
+    }
+}
+
+@Composable
+private fun DoneExercise(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+    ) {
+
     }
 }
 

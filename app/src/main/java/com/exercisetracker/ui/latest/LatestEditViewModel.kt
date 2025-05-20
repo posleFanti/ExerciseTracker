@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.data.entities.CompletedSetWithSet
 import com.exercisetracker.data.entities.CompletedWorkoutWithSets
+import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.data.repositories.CompletedWorkoutRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -36,6 +37,8 @@ class LatestEditViewModel(
         private set
 
     private val completedWorkoutId: Long = checkNotNull(savedStateHandle[LatestEditScreen.completedWorkoutIdArg])
+
+    private fun getExercisesWithCompletedSets() {}
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -62,6 +65,11 @@ data class CompletedWorkoutWithSetsDetails(
     val completedSetsWithSets: List<CompletedSetWithSet> = listOf()
 )
 
+data class ExerciseWithCompletedSets(
+    val exerciseId: Long = 0,
+    val exerciseName: String = "",
+    val completedSetsWithSets: CompletedWorkoutWithSets
+)
 
 fun CompletedWorkoutWithSets.toCompletedWorkoutWithSetsDetails(): CompletedWorkoutWithSetsDetails = CompletedWorkoutWithSetsDetails(
     completedWorkoutId = completedWorkout.completedWorkoutId,

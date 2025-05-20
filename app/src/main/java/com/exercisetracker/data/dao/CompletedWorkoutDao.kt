@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.exercisetracker.data.entities.CompletedWorkout
 import com.exercisetracker.data.entities.CompletedWorkoutWithSets
@@ -27,8 +28,10 @@ interface CompletedWorkoutDao {
     @Query("SELECT * FROM completed_workouts WHERE completed_workout_id = :id ORDER BY workout_date DESC")
     fun getCompletedWorkout(id: Long): Flow<CompletedWorkout?>
 
-    @Query("SELECT * FROM completed_workouts INNER JOIN completed_sets ON completed_workout_id = completed_set_id"
+    /*@Query("SELECT * FROM completed_workouts INNER JOIN completed_sets ON completed_workout_id = completed_set_id"
             + " INNER JOIN sets ON completed_set_id = set_id"
-            + " WHERE completed_workout_id = :id")
+            + " WHERE completed_workout_id = :id")*/
+    @Transaction
+    @Query("SELECT * FROM completed_workouts WHERE completed_workout_id = :id")
     fun getCompletedWorkoutWithSets(id: Long): Flow<CompletedWorkoutWithSets>
 }

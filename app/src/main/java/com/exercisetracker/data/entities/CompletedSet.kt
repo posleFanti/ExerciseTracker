@@ -53,5 +53,12 @@ data class CompletedSetWithSet(
         entityColumn = "set_id",
         entity = Set::class
     )
-    val originalSet: Set
+    val originalSet: Set,
+
+    @Relation(
+        parentColumn = "exercise_id",
+        entityColumn = "exercise_id",
+        entity = Exercise::class
+    )
+    val exercise: Exercise
 )
