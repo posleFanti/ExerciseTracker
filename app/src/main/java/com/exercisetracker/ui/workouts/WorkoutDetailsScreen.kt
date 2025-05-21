@@ -21,32 +21,42 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.Exercise
+import com.exercisetracker.data.entities.ExerciseWithSets
 import com.exercisetracker.data.entities.Workout
+import com.exercisetracker.data.entities.Set
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 
 object WorkoutDetailsDestination : NavigationDestination {
     override val route = "workout_details"
     override val titleRes = R.string.workout_details
+    const val workoutIdArg = "workoutId"
+    val routeWithArgs = "$route/{$workoutIdArg}"
 }
 
 @Composable
 fun WorkoutDetailsScreen(
-    workout: Workout,
     navigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: WorkoutDetailsViewModel = viewModel(factory = WorkoutDetailsViewModel.Factory)
 ) {
-    Scaffold (
+    val uiState = viewModel.workoutDetailsUiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    Scaffold(
         topBar = {
             TopAppBar(
-                title = "Тренировка " + workout.workoutId,
+                title = "Тренировка " + uiState.value.workoutId,
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
@@ -57,7 +67,7 @@ fun WorkoutDetailsScreen(
             }
         }
     ) { innerPadding ->
-        val exerciseList = listOf<Exercise>()
+        val exerciseList = uiState.value.exerciseList
         Column {
             Body(exerciseList, modifier.padding(innerPadding))
         }
@@ -66,7 +76,7 @@ fun WorkoutDetailsScreen(
 
 @Composable
 private fun Body(
-    exerciseList: List<Exercise>,
+    exerciseList: List<ExerciseWithSets>,
     modifier: Modifier = Modifier
 ) {
     if (exerciseList.isEmpty()) {
@@ -87,20 +97,23 @@ private fun Body(
 
 @Composable
 private fun ExerciseList(
-    exerciseList: List<Exercise>,
+    exerciseList: List<ExerciseWithSets>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn (
+    LazyColumn(
         modifier = modifier
     ) {
-        items (exerciseList) { exercise ->
+        items(exerciseList) { exercise ->
             Exercise(exercise, modifier)
         }
     }
 }
 
 @Composable
-private fun Exercise(exercise: Exercise, modifier: Modifier = Modifier) {
+private fun Exercise(
+    exerciseWithSets: ExerciseWithSets,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier.padding(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
@@ -109,7 +122,7 @@ private fun Exercise(exercise: Exercise, modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxWidth()
         ) {
             Text(
-                text = exercise.name,
+                text = exerciseWithSets.exercise.name,
                 modifier = modifier.padding(10.dp)
             )
         }
@@ -120,7 +133,7 @@ private fun Exercise(exercise: Exercise, modifier: Modifier = Modifier) {
                 modifier = modifier.padding(start = 30.dp, top = 10.dp)
             )
             Spacer(modifier.weight(1f))
-            Text (
+            Text(
                 text = "Кол-во повторов:",
                 modifier = modifier.padding(end = 30.dp, top = 10.dp)
             )
@@ -131,13 +144,13 @@ private fun Exercise(exercise: Exercise, modifier: Modifier = Modifier) {
 
 @Composable
 private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier) {
-    Column (
+    Column(
         modifier = modifier.padding(10.dp),
     ) {
         attemptsList.forEachIndexed { index, item ->
             Row {
                 Text(
-                    text = (index+1).toString(),
+                    text = (index + 1).toString(),
                     modifier = modifier.padding(horizontal = 40.dp)
                 )
                 Spacer(modifier.weight(1f))
@@ -150,20 +163,25 @@ private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier)
     }
 }
 
-@Preview(showBackground=true)
+@Preview(showBackground = true)
 @Composable
-fun WorkoutDetailsPreview() {
-    val exerciseList = listOf<Exercise>(Exercise(1,"Упражнение 1"), Exercise(2, "Упражнение 2"))
+fun WorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
-        WorkoutDetailsScreen(Workout(1, "Кардио"), {})
+        Body(
+            exerciseList = listOf(
+                ExerciseWithSets(
+                    exercise = Exercise(0, "Cardio"),
+                    sets = listOf(Set(0, 0, 0, 0, 4), Set(1, 0, 0, 1, 5))
+                )
+            )
+        )
     }
 }
 
-@Preview(showBackground=true)
+@Preview(showBackground = true)
 @Composable
-fun NoWorkoutDetailsPreview() {
-    val exerciseList = listOf<Exercise>()
+fun NoWorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
-        WorkoutDetailsScreen(Workout(1, "Кардио"), {})
+        Body(exerciseList = listOf())
     }
 }

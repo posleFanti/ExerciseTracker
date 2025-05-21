@@ -1,6 +1,7 @@
 package com.exercisetracker.ui.latest
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,7 +20,12 @@ import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 import java.time.LocalDate
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import com.exercisetracker.data.entities.CompletedSet
 import com.exercisetracker.data.entities.CompletedSetWithSet
+import com.exercisetracker.data.entities.Exercise
+import com.exercisetracker.data.entities.ExerciseWithCompletedSets
+import com.exercisetracker.data.entities.Set
 
 object LatestEditScreen : NavigationDestination {
     override val route = "latest_edit"
@@ -74,20 +80,32 @@ private fun DoneExercisesList(
     LazyColumn(
         modifier = modifier
     ) {
-        items(items = latestEditUiState.completedWorkoutDetails.completedSetsWithSets, key = {it.originalSet}) { item ->
-            DoneExercise()
+        items(items = latestEditUiState.exerciseList, key = { it.exerciseId }) { item ->
+            DoneExercise(item)
         }
     }
 }
 
 @Composable
 private fun DoneExercise(
+    exerciseWithCompletedSetsDetails: ExerciseWithCompletedSetsDetails,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
     ) {
-
+        Text(
+            text = exerciseWithCompletedSetsDetails.name,
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        LazyColumn {
+            items(items = exerciseWithCompletedSetsDetails.completedSetsWithSetList, key = {it.completedSet.setId}) { item ->
+                Row {
+                    Text(text = item.completedSet.actualReps.toString())
+                    Text(text = item.completedSet.weight.toString())
+                }
+            }
+        }
     }
 }
 
@@ -96,12 +114,15 @@ private fun DoneExercise(
 fun BodyPreview() {
     ExerciseTrackerTheme {
         LatestEditScreenBody(LatestEditUiState(
-            CompletedWorkoutWithSetsDetails(
-                completedWorkoutId = 0,
-                workoutId = 0,
-                date = LocalDate.of(2025, 1, 1),
-                completedSetsWithSets = listOf()
-            )
+            exerciseList = listOf(ExerciseWithCompletedSetsDetails(
+                exerciseId = 0,
+                name = "Упражнение",
+                completedSetsWithSetList = listOf(CompletedSetWithSet(
+                    completedSet = CompletedSet(0, 1, 2, 37f, 4),
+                    originalSet = Set(0, 0, 1, 0, 4),
+                    exercise = Exercise(0, "Упражнение")
+                ))
+            ))
         ))
     }
 }

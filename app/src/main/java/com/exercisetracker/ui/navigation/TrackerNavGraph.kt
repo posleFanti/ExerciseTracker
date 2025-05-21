@@ -25,7 +25,6 @@ import com.exercisetracker.ui.workouts.WorkoutScreen
 import com.exercisetracker.ui.workouts.WorkoutsDestination
 import java.time.LocalDate
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TrackerNavHost (
     navController: NavHostController,
@@ -52,8 +51,13 @@ fun TrackerNavHost (
         composable(route = ExerciseEditDestination.route) {
             ExerciseEditScreen(Exercise(1, "Упражнение"), modifier) { navController.popBackStack() }
         }
-        composable(route = WorkoutDetailsDestination.route) {
-            WorkoutDetailsScreen(Workout(1, "Кардио"), { navController.popBackStack() })
+        composable(
+            route = WorkoutDetailsDestination.route,
+            arguments = listOf(navArgument(WorkoutDetailsDestination.workoutIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            WorkoutDetailsScreen({ navController.popBackStack() })
         }
         composable(
             route = LatestEditScreen.route,
@@ -62,7 +66,6 @@ fun TrackerNavHost (
             })
         ) {
             LatestEditScreen(
-                completedWorkout = CompletedWorkout(completedWorkoutId = 1, workoutId = 1, date = LocalDate.of(2025, 5, 7)),
                 navigateBack = { navController.popBackStack() },
                 modifier = modifier
             )

@@ -5,8 +5,10 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.exercisetracker.data.entities.Workout
+import com.exercisetracker.data.entities.WorkoutWithExercises
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,4 +27,8 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workouts WHERE workout_id = :id ORDER BY workout_type ASC")
     fun getWorkout(id: Long): Flow<Workout?>
+
+    @Transaction
+    @Query("SELECT * FROM workouts WHERE workout_id = :id")
+    fun getWorkoutWithExercises(id: Long): Flow<WorkoutWithExercises>
 }

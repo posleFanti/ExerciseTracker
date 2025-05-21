@@ -20,7 +20,8 @@ class AppDataContainer(private val context: Context) : AppContainer {
     }
     override val completedWorkoutRepository: CompletedWorkoutRepository by lazy {
         OfflineCompletedWorkoutRepository(
-            AppDatabase.getDatabase(context).completedWorkoutDao()
+            AppDatabase.getDatabase(context).completedWorkoutDao(),
+            AppDatabase.getDatabase(context).exerciseDao()
         )
     }
 }

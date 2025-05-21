@@ -4,6 +4,7 @@ import com.exercisetracker.data.dao.SetDao
 import com.exercisetracker.data.dao.WorkoutDao
 import com.exercisetracker.data.entities.Set
 import com.exercisetracker.data.entities.Workout
+import com.exercisetracker.data.entities.WorkoutWithExercises
 import kotlinx.coroutines.flow.Flow
 
 class OfflineWorkoutRepository(
@@ -12,6 +13,9 @@ class OfflineWorkoutRepository(
 ) : WorkoutRepository {
     override fun getAllWorkoutsStream(): Flow<List<Workout>> =
         workoutDao.getAllWorkouts()
+
+    override fun getWorkoutWithExercisesStream(id: Long): Flow<WorkoutWithExercises?> =
+        workoutDao.getWorkoutWithExercises(id)
 
     override fun getWorkoutStream(id: Long): Flow<Workout?> =
         workoutDao.getWorkout(id)
