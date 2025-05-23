@@ -34,6 +34,9 @@ object LatestEditScreen : NavigationDestination {
     val routeWithArgs = "$route/{$completedWorkoutIdArg}"
 }
 
+// TODO:    Add updating ui state
+//          Add output of ui state correctly
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LatestEditScreen(

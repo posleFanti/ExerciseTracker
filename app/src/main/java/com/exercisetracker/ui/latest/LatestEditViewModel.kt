@@ -21,6 +21,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+// TODO:    Add updating ui state
+//          Add inserting data to db
+
 class LatestEditViewModel(
     savedStateHandle: SavedStateHandle,
     private val completedWorkoutRepository: CompletedWorkoutRepository

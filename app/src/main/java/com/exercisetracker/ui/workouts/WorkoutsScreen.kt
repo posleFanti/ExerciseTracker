@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +47,8 @@ import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 object WorkoutsDestination : NavigationDestination {
     override val route = "workouts"
@@ -54,13 +57,13 @@ object WorkoutsDestination : NavigationDestination {
 
 @Composable
 fun WorkoutScreen(
-    toWorkoutDetails: () -> Unit,
+    toWorkoutDetails: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WorkoutsViewModel = viewModel(factory = WorkoutsViewModel.Factory)
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
-    //val workoutList = listOf(Workout(0, "Cardio"), Workout(2, "Power"))
     val workoutsUiState by viewModel.workoutsUiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold (
         topBar = { TopAppBar(
@@ -76,14 +79,24 @@ fun WorkoutScreen(
         Body(workoutsUiState.workoutList, toWorkoutDetails = toWorkoutDetails, modifier = modifier.padding(innerPadding))
     }
 
-    if (showAddDialog)
-        WorkoutAddDialog(onAcceptRequest = {}, onDismissRequest = {}, modifier = modifier)
+    if (showAddDialog) {
+        WorkoutAddDialog(
+            onAcceptRequest = { type ->
+                coroutineScope.launch {
+                    viewModel.addWorkout(Workout(type = type))
+                    showAddDialog = false
+                }
+            },
+            onDismissRequest = { showAddDialog = false },
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
 private fun Body(
     workoutList: List<Workout>,
-    toWorkoutDetails: () -> Unit,
+    toWorkoutDetails: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -106,7 +119,7 @@ private fun Body(
 @Composable
 private fun WorkoutList(
     workoutList: List<Workout>,
-    toWorkoutDetails: () -> Unit,
+    toWorkoutDetails: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -126,13 +139,13 @@ private fun WorkoutList(
 @Composable
 private fun WorkoutItem(
     workout: Workout,
-    toWorkoutDetails: () -> Unit,
+    toWorkoutDetails: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-        onClick = toWorkoutDetails
+        onClick = { toWorkoutDetails(workout.workoutId) }
     ) {
         Row(
             modifier = modifier.padding(20.dp),
@@ -158,13 +171,16 @@ private fun WorkoutItem(
     }
 }
 
-// TODO: Implement state changing
+// TODO: Implement state changing (done, check if working)
+//       Implement adding workout to db (done, check if working)
 @Composable
 private fun WorkoutAddDialog(
-    onAcceptRequest: () -> Unit,
+    onAcceptRequest: (String) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var workoutType by remember { mutableStateOf("") }
+
     Dialog(
         onDismissRequest = onDismissRequest,
     ) {
@@ -184,15 +200,8 @@ private fun WorkoutAddDialog(
                     .padding(top = 16.dp, bottom = 16.dp)
             )
             OutlinedTextField(
-                value = "Название тренировки",
-                onValueChange = {},
-                label = { Text("Название") },
-                maxLines = 1,
-                modifier = modifier.padding(horizontal = 16.dp),
-            )
-            OutlinedTextField(
                 value = "Тип тренировки",
-                onValueChange = {},
+                onValueChange = { workoutType = it },
                 label = { Text("Тип") },
                 maxLines = 1,
                 modifier = modifier.padding(16.dp),
@@ -203,7 +212,10 @@ private fun WorkoutAddDialog(
                 modifier = modifier.padding(horizontal = 10.dp)
             ){
                 TextButton(
-                    onClick = { onDismissRequest() },
+                    onClick = {
+                        if (workoutType.isNotBlank())
+                            onAcceptRequest(workoutType)
+                        },
                 ) { Text("Добавить") }
                 Spacer(modifier.weight(1f))
                 TextButton(

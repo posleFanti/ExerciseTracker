@@ -44,14 +44,16 @@ object WorkoutDetailsDestination : NavigationDestination {
     val routeWithArgs = "$route/{$workoutIdArg}"
 }
 
+// TODO:    Add navigation to edit workout
+
 @Composable
 fun WorkoutDetailsScreen(
+    navigateToEditWorkout: (Long) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WorkoutDetailsViewModel = viewModel(factory = WorkoutDetailsViewModel.Factory)
 ) {
     val uiState = viewModel.workoutDetailsUiState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -62,20 +64,21 @@ fun WorkoutDetailsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
+            FloatingActionButton(onClick = { /*Add exercise*/ }) {
                 Icon(Icons.Default.Add, "Add")
             }
         }
     ) { innerPadding ->
         val exerciseList = uiState.value.exerciseList
         Column {
-            Body(exerciseList, modifier.padding(innerPadding))
+            Body({navigateToEditWorkout},exerciseList, modifier.padding(innerPadding))
         }
     }
 }
 
 @Composable
 private fun Body(
+    navigateToEditWorkout: (Long) -> Unit,
     exerciseList: List<ExerciseWithSets>,
     modifier: Modifier = Modifier
 ) {
@@ -91,12 +94,13 @@ private fun Body(
             style = MaterialTheme.typography.titleLarge,
             modifier = modifier.padding(horizontal = 20.dp, vertical = 10.dp)
         )
-        ExerciseList(exerciseList)
+        ExerciseList({navigateToEditWorkout},exerciseList)
     }
 }
 
 @Composable
 private fun ExerciseList(
+    navigateToEditWorkout: (Long) -> Unit,
     exerciseList: List<ExerciseWithSets>,
     modifier: Modifier = Modifier
 ) {
@@ -104,18 +108,20 @@ private fun ExerciseList(
         modifier = modifier
     ) {
         items(exerciseList) { exercise ->
-            Exercise(exercise, modifier)
+            Exercise({navigateToEditWorkout}, exercise, modifier)
         }
     }
 }
 
 @Composable
 private fun Exercise(
+    navigateToEditWorkout: (Long) -> Unit,
     exerciseWithSets: ExerciseWithSets,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.padding(10.dp),
+        onClick = { navigateToEditWorkout(exerciseWithSets.exercise.exerciseId) },
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
         Row(
@@ -134,7 +140,7 @@ private fun Exercise(
             )
             Spacer(modifier.weight(1f))
             Text(
-                text = "Кол-во повторов:",
+                text = "Кол-во повторов: ",
                 modifier = modifier.padding(end = 30.dp, top = 10.dp)
             )
         }
@@ -168,6 +174,7 @@ private fun AttemptsList(attemptsList: List<Int>, modifier: Modifier = Modifier)
 fun WorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
         Body(
+            navigateToEditWorkout = {},
             exerciseList = listOf(
                 ExerciseWithSets(
                     exercise = Exercise(0, "Cardio"),
@@ -182,6 +189,6 @@ fun WorkoutDetailsBodyPreview() {
 @Composable
 fun NoWorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
-        Body(exerciseList = listOf())
+        Body(navigateToEditWorkout = {}, exerciseList = listOf())
     }
 }

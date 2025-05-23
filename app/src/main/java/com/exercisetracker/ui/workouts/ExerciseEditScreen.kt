@@ -32,6 +32,9 @@ object ExerciseEditDestination : NavigationDestination {
     override val titleRes = R.string.exercise_edit_title
 }
 
+// TODO:    Add value change processing
+//          Add ViewModel
+
 @Composable
 fun ExerciseEditScreen(
     exercise: Exercise,

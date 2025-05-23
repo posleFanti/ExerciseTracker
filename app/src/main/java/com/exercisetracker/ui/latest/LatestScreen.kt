@@ -2,8 +2,6 @@
 
 package com.exercisetracker.ui.latest
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,10 +38,11 @@ object LatestDestination : NavigationDestination {
     override val titleRes = R.string.latest_title
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+//TODO: Fix displaying problems
+
 @Composable
 fun LatestScreen(
-    toCompletedWorkoutDetails: () -> Unit,
+    navigateToCompletedWorkoutDetails: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LatestViewModel = viewModel(factory = LatestViewModel.Factory)
 ) {
@@ -64,7 +63,7 @@ fun LatestScreen(
     ) { innerPadding ->
         LatestEditScreenBody(
             completedList = latestUiState.completedWorkoutsList,
-            toCompletedWorkoutDetails = toCompletedWorkoutDetails,
+            toCompletedWorkoutDetails = navigateToCompletedWorkoutDetails,
             modifier = modifier.padding(innerPadding)
         )
     }
@@ -158,7 +157,6 @@ fun EmptyListTextPreview() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun CompletedWorkoutListPreview() {
@@ -172,7 +170,6 @@ fun CompletedWorkoutListPreview() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun DoneWorkoutItemPreview() {
@@ -181,7 +178,6 @@ fun DoneWorkoutItemPreview() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun DoneWorkoutScreenPreview() {

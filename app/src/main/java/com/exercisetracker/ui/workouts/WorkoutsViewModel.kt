@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class WorkoutsViewModel(
-    workoutRepository: WorkoutRepository
+    private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
     val workoutsUiState: StateFlow<WorkoutsUiState> =
         workoutRepository.getAllWorkoutsStream().map { WorkoutsUiState(it) }
@@ -26,6 +26,10 @@ class WorkoutsViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = WorkoutsUiState()
             )
+
+    suspend fun addWorkout(workout: Workout) {
+        workoutRepository.insertWorkout(workout)
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
