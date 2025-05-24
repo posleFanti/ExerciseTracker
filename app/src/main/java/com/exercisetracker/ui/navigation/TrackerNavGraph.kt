@@ -8,20 +8,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.exercisetracker.data.entities.Exercise
-import com.exercisetracker.ui.latest.LatestDestination
-import com.exercisetracker.ui.latest.LatestEditScreen
-import com.exercisetracker.ui.latest.LatestScreen
 import com.exercisetracker.ui.stats.StatsDestination
 import com.exercisetracker.ui.stats.StatsScreen
-import com.exercisetracker.ui.workouts.ExerciseEditDestination
-import com.exercisetracker.ui.workouts.ExerciseEditScreen
+import com.exercisetracker.ui.exercises.ExerciseEditDestination
+import com.exercisetracker.ui.exercises.ExerciseEditScreen
+import com.exercisetracker.ui.workouts.DoneExerciseEditDestination
+import com.exercisetracker.ui.workouts.DoneExerciseEditScreen
 import com.exercisetracker.ui.workouts.WorkoutDetailsDestination
 import com.exercisetracker.ui.workouts.WorkoutDetailsScreen
 import com.exercisetracker.ui.workouts.WorkoutScreen
 import com.exercisetracker.ui.workouts.WorkoutsDestination
-
-// TODO:    Add navigating to item by id
-//          Add navigation to LatestDetails
 
 @Composable
 fun TrackerNavHost (
@@ -30,14 +26,9 @@ fun TrackerNavHost (
 ) {
     NavHost(
         navController = navController,
-        startDestination = LatestDestination.route,
+        startDestination = WorkoutsDestination.route,
         modifier = modifier
     ) {
-        composable(route = LatestDestination.route) {
-            LatestScreen(
-                navigateToCompletedWorkoutDetails = { navController.navigate("${LatestDestination.route}/$it") }
-            )
-        }
         composable(route = WorkoutsDestination.route) {
             WorkoutScreen(
                 toWorkoutDetails = { navController.navigate("${WorkoutDetailsDestination.route}/$it") },
@@ -55,20 +46,21 @@ fun TrackerNavHost (
                 type = NavType.LongType
             })
         ) {
+            val workoutId = checkNotNull(it.arguments?.getLong("workoutId"))
             WorkoutDetailsScreen(
-                navigateToEditWorkout = { navController.navigate("${WorkoutDetailsDestination.route}/$it") },
+                navigateToEditWorkout = { exerciseId -> navController.navigate("${DoneExerciseEditDestination.route}/$workoutId/$exerciseId") },
                 navigateBack = { navController.popBackStack() }
             )
         }
         composable(
-            route = LatestEditScreen.routeWithArgs,
-            arguments = listOf(navArgument(LatestEditScreen.completedWorkoutIdArg) {
-                type = NavType.LongType
-            })
+            route = DoneExerciseEditDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(DoneExerciseEditDestination.workoutIdArg) { type = NavType.LongType },
+                navArgument(DoneExerciseEditDestination.exerciseIdArg) { type = NavType.LongType }
+            )
         ) {
-            LatestEditScreen(
-                navigateBack = { navController.popBackStack() },
-                modifier = modifier
+            DoneExerciseEditScreen(
+                navigateBack = { navController.popBackStack() }
             )
         }
     }

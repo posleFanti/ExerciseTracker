@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.exercisetracker.ui.latest.LatestDestination
+import com.exercisetracker.ui.exercises.ExercisesDestination
 import com.exercisetracker.ui.navigation.TrackerNavHost
 import com.exercisetracker.ui.stats.StatsDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
@@ -42,7 +42,7 @@ fun TrackerApp(navController: NavHostController = rememberNavController()) {
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
-            if (currentRoute in listOf(WorkoutsDestination.route, LatestDestination.route,
+            if (currentRoute in listOf(WorkoutsDestination.route, ExercisesDestination.route,
                     StatsDestination.route)) {
                 BottomNavBar(navController)
             }
@@ -83,14 +83,14 @@ fun BottomNavBar(
 ) {
     val items = listOf(
         BottomNavItem(
-            title = "Последние",
-            route = LatestDestination.route,
-            selectedIcon = Icons.Filled.DateRange,
-            unselectedIcon = Icons.Outlined.DateRange
-        ),
-        BottomNavItem(
             title = "Тренировки",
             route = WorkoutsDestination.route,
+            selectedIcon = Icons.Filled.Face,
+            unselectedIcon = Icons.Outlined.Face
+        ),
+        BottomNavItem(
+            title = "Упражнения",
+            route = ExercisesDestination.route,
             selectedIcon = Icons.Filled.Face,
             unselectedIcon = Icons.Outlined.Face
         ),

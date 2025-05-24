@@ -3,6 +3,8 @@ package com.exercisetracker.data.entities
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
@@ -12,18 +14,16 @@ data class Workout(
     @ColumnInfo(name = "workout_id")
     val workoutId: Long = 0,
 
-    @ColumnInfo(name = "workout_type")
-    val type: String
+    val name: String = "Unnamed",
+    val type: String = "Undefined",
+    val date: String = "1980-01-01",
 )
 
-data class WorkoutWithExercises(
-    @Embedded
-    val workout: Workout,
-
+data class WorkoutWithExercisesWithSets(
+    @Embedded val workout: Workout,
     @Relation(
         parentColumn = "workout_id",
-        entityColumn = "workout_id",
-        entity = Exercise::class
+        entityColumn = "workout_id"
     )
-    val exerciseList: List<ExerciseWithSets>
+    var exercisesWithSets: List<ExerciseWithSetsView>
 )

@@ -3,7 +3,6 @@ package com.exercisetracker.data.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -21,8 +20,7 @@ import androidx.room.PrimaryKey
             childColumns = ["workout_id"],
             onDelete = ForeignKey.CASCADE
         )
-    ],
-    indices = [Index("workout_id"), Index("exercise_id")]
+    ]
 )
 data class Set(
     @PrimaryKey(autoGenerate = true)
@@ -36,8 +34,8 @@ data class Set(
     val workoutId: Long,
 
     @ColumnInfo(name = "set_number")
-    val number: Int,
+    val setNumber: Int,
 
-    @ColumnInfo(name = "reps")
-    val reps: Int
+    val weight: Double,
+    val reps: Int,
 )

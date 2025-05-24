@@ -1,17 +1,26 @@
 package com.exercisetracker.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import com.exercisetracker.data.entities.Exercise
 import kotlinx.coroutines.flow.Flow
 import com.exercisetracker.data.entities.Set
 
 @Dao
 interface SetDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(set: Set): Long
 
-    @Query("SELECT * FROM sets WHERE workout_id = :workoutId ORDER BY set_number ASC")
-    fun getSetsForWorkout(workoutId: Long): Flow<List<Set>>
+    @Update
+    suspend fun update(set: Set)
+
+    @Delete
+    suspend fun delete(set: Set)
+
+    @Query("SELECT * FROM sets WHERE workout_id = :workoutId AND exercise_id = :exerciseId ORDER BY exercise_id ASC, set_number ASC")
+    fun getSets(workoutId: Long, exerciseId: Long): Flow<List<Set>?>
 }

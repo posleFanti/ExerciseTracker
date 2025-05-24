@@ -47,8 +47,9 @@ import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object WorkoutsDestination : NavigationDestination {
     override val route = "workouts"
@@ -81,9 +82,9 @@ fun WorkoutScreen(
 
     if (showAddDialog) {
         WorkoutAddDialog(
-            onAcceptRequest = { type ->
+            onAcceptRequest = { name, type, date ->
                 coroutineScope.launch {
-                    viewModel.addWorkout(Workout(type = type))
+                    viewModel.addWorkout(Workout(name = name,type = type, date = date))
                     showAddDialog = false
                 }
             },
@@ -171,15 +172,15 @@ private fun WorkoutItem(
     }
 }
 
-// TODO: Implement state changing (done, check if working)
-//       Implement adding workout to db (done, check if working)
 @Composable
 private fun WorkoutAddDialog(
-    onAcceptRequest: (String) -> Unit,
+    onAcceptRequest: (String, String, String) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var workoutType by remember { mutableStateOf("") }
+    var workoutType by remember { mutableStateOf("Тип тренировки") }
+    var workoutName by remember { mutableStateOf("Название тренировки") }
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -187,7 +188,7 @@ private fun WorkoutAddDialog(
         Card (
             modifier = modifier
                 .fillMaxWidth()
-                .height(275.dp)
+                .height(285.dp)
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(20.dp),
         ) {
@@ -200,11 +201,18 @@ private fun WorkoutAddDialog(
                     .padding(top = 16.dp, bottom = 16.dp)
             )
             OutlinedTextField(
-                value = "Тип тренировки",
+                value = workoutName,
+                onValueChange = { workoutName = it },
+                label = { Text("Название") },
+                maxLines = 1,
+                modifier = modifier.padding(10.dp),
+            )
+            OutlinedTextField(
+                value = workoutType,
                 onValueChange = { workoutType = it },
                 label = { Text("Тип") },
                 maxLines = 1,
-                modifier = modifier.padding(16.dp),
+                modifier = modifier.padding(10.dp),
             )
             Row (
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -213,8 +221,8 @@ private fun WorkoutAddDialog(
             ){
                 TextButton(
                     onClick = {
-                        if (workoutType.isNotBlank())
-                            onAcceptRequest(workoutType)
+                        if (workoutName.isNotBlank() && workoutType.isNotBlank())
+                            onAcceptRequest(workoutName, workoutType, LocalDate.now().format(formatter))
                         },
                 ) { Text("Добавить") }
                 Spacer(modifier.weight(1f))
@@ -230,9 +238,9 @@ private fun WorkoutAddDialog(
 @Composable
 fun WorkoutListPreview() {
     val list = listOf(
-        Workout(1, "Cardio"),
-        Workout(2, "Power"),
-        Workout(3, "Legs")
+        Workout(workoutId = 0, name = "Название", type = "Силовая", date = "2025-05-05"),
+        Workout(workoutId = 1, name = "Название", type = "Кардио", date = "2025-05-10"),
+        Workout(workoutId = 2, name = "Название", type = "Силовая", date = "2025-05-15"),
     )
     ExerciseTrackerTheme {
         WorkoutList(list, {})
@@ -243,7 +251,7 @@ fun WorkoutListPreview() {
 @Composable
 fun WorkoutItemPreview() {
     ExerciseTrackerTheme {
-        WorkoutItem(Workout(1, "Cardio"), {})
+        WorkoutItem(Workout(name = "Название", type = "Силовая", date = "2025-05-05"), {})
     }
 }
 
@@ -251,6 +259,6 @@ fun WorkoutItemPreview() {
 @Composable
 fun WorkoutAddDialogPreview() {
     ExerciseTrackerTheme {
-        WorkoutAddDialog({},{})
+        WorkoutAddDialog(onAcceptRequest = { _, _, _ -> }, onDismissRequest = {})
     }
 }

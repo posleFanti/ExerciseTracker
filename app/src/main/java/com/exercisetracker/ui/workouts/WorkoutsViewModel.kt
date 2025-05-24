@@ -10,7 +10,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.TrackerApplication
 import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.data.repositories.WorkoutRepository
-import com.exercisetracker.ui.latest.trackerApplication
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
