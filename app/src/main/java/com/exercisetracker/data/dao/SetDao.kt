@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.exercisetracker.data.entities.DateMaxWeight
 import com.exercisetracker.data.entities.Exercise
 import kotlinx.coroutines.flow.Flow
 import com.exercisetracker.data.entities.Set
@@ -23,4 +24,14 @@ interface SetDao {
 
     @Query("SELECT * FROM sets WHERE workout_id = :workoutId AND exercise_id = :exerciseId ORDER BY exercise_id ASC, set_number ASC")
     fun getSets(workoutId: Long, exerciseId: Long): Flow<List<Set>?>
+
+    @Query("""
+        SELECT workouts.date as date, MAX(sets.weight) as max_weight 
+        FROM sets 
+        INNER JOIN workouts ON sets.workout_id = workouts.workout_id 
+        WHERE sets.exercise_id = :exerciseId 
+        GROUP BY workouts.date
+        ORDER BY workouts.date
+    """)
+    fun getExerciseStats(exerciseId: Long): Flow<List<DateMaxWeight>>
 }

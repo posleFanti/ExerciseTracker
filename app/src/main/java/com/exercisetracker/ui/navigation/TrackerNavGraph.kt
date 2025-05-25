@@ -12,6 +12,8 @@ import com.exercisetracker.ui.stats.StatsDestination
 import com.exercisetracker.ui.stats.StatsScreen
 import com.exercisetracker.ui.exercises.ExerciseEditDestination
 import com.exercisetracker.ui.exercises.ExerciseEditScreen
+import com.exercisetracker.ui.exercises.ExercisesDestination
+import com.exercisetracker.ui.exercises.ExercisesScreen
 import com.exercisetracker.ui.workouts.DoneExerciseEditDestination
 import com.exercisetracker.ui.workouts.DoneExerciseEditScreen
 import com.exercisetracker.ui.workouts.WorkoutDetailsDestination
@@ -37,8 +39,21 @@ fun TrackerNavHost (
         composable(route = StatsDestination.route) {
             StatsScreen()
         }
-        composable(route = ExerciseEditDestination.route) {
-            ExerciseEditScreen(Exercise(1, "Упражнение"), modifier) { navController.popBackStack() }
+        composable(route = ExercisesDestination.route) {
+            ExercisesScreen(
+                navigateToExerciseEdit = { navController.navigate("${ExerciseEditDestination.route}/$it") }
+            )
+        }
+        composable(
+            route = ExerciseEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(ExerciseEditDestination.exerciseIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            ExerciseEditScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateUp = { navController.navigateUp() }
+            )
         }
         composable(
             route = WorkoutDetailsDestination.routeWithArgs,

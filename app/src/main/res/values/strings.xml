@@ -8,4 +8,6 @@
     <string name="exercise_edit_title">Редактирование упражнения</string>
     <string name="exercises">Exercises</string>
     <string name="done_exercise_edit">Done exercise edit</string>
+    <string name="exercises_screen_name">Упражнения</string>
+    <string name="stats_screen">Статистика</string>
 </resources>

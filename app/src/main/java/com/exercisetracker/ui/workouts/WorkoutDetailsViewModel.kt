@@ -1,8 +1,10 @@
 package com.exercisetracker.ui.workouts
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +18,10 @@ import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.data.entities.WorkoutWithExercisesWithSets
 import com.exercisetracker.data.entities.Set
 import com.exercisetracker.data.repositories.WorkoutRepository
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class WorkoutDetailsViewModel(
@@ -26,15 +32,52 @@ class WorkoutDetailsViewModel(
     var uiState by mutableStateOf(WorkoutDetailsUiState())
         private set
 
+    private val _searchQuery = mutableStateOf("")
+    val searchQuery: State<String> = _searchQuery
+
+    private val _searchResults = mutableStateOf(emptyList<Exercise>())
+    val searchResults: State<List<Exercise>> = _searchResults
+
     init {
         viewModelScope.launch {
             uiState = workoutRepository.getWorkoutWithExercisesWithSets(workoutId)
                     .toWorkoutDetailsUiState()
+            snapshotFlow { _searchQuery.value }
+                .debounce(300) // Задержка для уменьшения запросов
+                .distinctUntilChanged()
+                .collect { query ->
+                    _searchResults.value = if (query.isBlank()) {
+                        workoutRepository.getAllExercises()
+                            .filterNotNull()
+                            .first()
+                    } else {
+                        workoutRepository.searchExercises("%$query%")
+                    }
+                }
         }
     }
 
-    fun addExerciseWithSets() {
+    suspend fun addExerciseWithSets(exercise: Exercise) {
+        val currentWorkoutId = uiState.workout.workoutId
+        val newSet = Set(
+            exerciseId = exercise.exerciseId,
+            workoutId = currentWorkoutId,
+            setNumber = 1, // Автоматическая нумерация
+            weight = 0.0,
+            reps = 0
+        )
 
+        workoutRepository.insertSet(newSet)
+    }
+
+    suspend fun deleteExercise(exerciseWithSets: ExerciseWithSets) {
+        exerciseWithSets.sets.forEach { set ->
+            workoutRepository.deleteSet(set)
+        }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
     }
 
     companion object {

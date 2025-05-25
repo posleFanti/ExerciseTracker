@@ -1,8 +1,10 @@
 package com.exercisetracker.data.repositories
 
+import androidx.compose.ui.text.TextLayoutResult
 import com.exercisetracker.data.dao.ExerciseDao
 import com.exercisetracker.data.dao.SetDao
 import com.exercisetracker.data.dao.WorkoutDao
+import com.exercisetracker.data.entities.DateMaxWeight
 import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.data.entities.ExerciseWithSetsView
 import com.exercisetracker.data.entities.Set
@@ -32,6 +34,15 @@ class OfflineWorkoutRepository(
         exerciseId: Long
     ): Flow<List<Set>?> = setDao.getSets(workoutId, exerciseId)
 
+    override fun getAllExercises(): Flow<List<Exercise>> =
+        exerciseDao.getAllExercises()
+
+    override fun getExercise(exerciseId: Long): Flow<Exercise> =
+        exerciseDao.getExerciseById(exerciseId)
+
+    override fun getExerciseStats(exerciseId: Long): Flow<List<DateMaxWeight>> =
+        setDao.getExerciseStats(exerciseId)
+
     override suspend fun getWorkoutWithExercisesWithSets(workoutId: Long): WorkoutWithExercisesWithSets =
         workoutDao.getWorkoutWithExercisesAndSets(workoutId)
 
@@ -45,6 +56,9 @@ class OfflineWorkoutRepository(
 
     override suspend fun insertSet(set: Set): Long =
         setDao.insert(set)
+
+    override suspend fun insertExercise(exercise: Exercise) =
+        exerciseDao.insert(exercise)
 
     override suspend fun deleteWorkout(workout: Workout) =
         workoutDao.delete(workout)
@@ -60,6 +74,9 @@ class OfflineWorkoutRepository(
 
     override suspend fun updateSet(set: Set) =
         setDao.update(set)
+
+    override suspend fun searchExercises(query: String): List<Exercise> =
+        exerciseDao.searchExercises(query)
 
     override suspend fun runInTransaction(block: suspend () -> Unit) {
         withContext(Dispatchers.IO) {

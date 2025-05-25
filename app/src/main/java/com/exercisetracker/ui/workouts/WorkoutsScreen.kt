@@ -162,6 +162,10 @@ private fun WorkoutItem(
                     text = workout.type,
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = workout.date,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Spacer(Modifier.weight(1f))
             Image(

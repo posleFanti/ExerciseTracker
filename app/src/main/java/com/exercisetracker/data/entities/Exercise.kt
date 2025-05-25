@@ -14,6 +14,7 @@ data class Exercise(
 
     @ColumnInfo(name = "exercise_name")
     val name: String = "Unnamed"
+
 )
 
 @DatabaseView(
@@ -44,4 +45,11 @@ data class ExerciseWithSetsView(
 
     val weight: Double,
     val reps: Int
+)
+
+data class DateMaxWeight(
+    val date: String,
+
+    @ColumnInfo(name = "max_weight")
+    val maxWeight: Double
 )

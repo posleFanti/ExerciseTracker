@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,12 +23,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
@@ -35,6 +45,7 @@ import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.data.entities.Set
 import com.exercisetracker.ui.navigation.NavigationDestination
 import com.exercisetracker.ui.theme.ExerciseTrackerTheme
+import kotlinx.coroutines.launch
 
 object WorkoutDetailsDestination : NavigationDestination {
     override val route = "workout_details"
@@ -52,7 +63,9 @@ fun WorkoutDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: WorkoutDetailsViewModel = viewModel(factory = WorkoutDetailsViewModel.Factory)
 ) {
+    var showAddDialog by remember { mutableStateOf(false) }
     val uiState = viewModel.uiState
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -63,7 +76,7 @@ fun WorkoutDetailsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.addExerciseWithSets() }) {
+            FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, "Add")
             }
         }
@@ -72,16 +85,33 @@ fun WorkoutDetailsScreen(
         Column {
             DetailsBody(
                 navigateToEditWorkout = navigateToEditWorkout,
+                doneExerciseDelete = { coroutineScope.launch {
+                    viewModel.deleteExercise(it)
+                } },
                 exerciseList = exerciseList,
                 modifier = modifier.padding(innerPadding)
             )
         }
+    }
+
+    if (showAddDialog) {
+        ExerciseToWorkoutAddDialog(
+            onAcceptRequest = {
+                coroutineScope.launch {
+                    viewModel.addExerciseWithSets(it)
+                }
+            },
+            onDismissRequest = { showAddDialog = false },
+            viewModel = viewModel,
+            modifier = modifier
+        )
     }
 }
 
 @Composable
 private fun DetailsBody(
     navigateToEditWorkout: (Long) -> Unit,
+    doneExerciseDelete: (ExerciseWithSets) -> Unit,
     exerciseList: List<ExerciseWithSets>,
     modifier: Modifier = Modifier
 ) {
@@ -97,13 +127,14 @@ private fun DetailsBody(
             style = MaterialTheme.typography.titleLarge,
             modifier = modifier.padding(horizontal = 20.dp, vertical = 10.dp)
         )
-        ExerciseList(navigateToEditWorkout,exerciseList)
+        ExerciseList(navigateToEditWorkout, doneExerciseDelete, exerciseList)
     }
 }
 
 @Composable
 private fun ExerciseList(
     navigateToEditWorkout: (Long) -> Unit,
+    doneExerciseDelete: (ExerciseWithSets) -> Unit,
     exerciseList: List<ExerciseWithSets>,
     modifier: Modifier = Modifier
 ) {
@@ -111,7 +142,7 @@ private fun ExerciseList(
         modifier = modifier
     ) {
         items(exerciseList) { exercise ->
-            Exercise(navigateToEditWorkout, exercise, modifier)
+            Exercise(navigateToEditWorkout, doneExerciseDelete, exercise, modifier)
         }
     }
 }
@@ -119,6 +150,7 @@ private fun ExerciseList(
 @Composable
 private fun Exercise(
     navigateToEditWorkout: (Long) -> Unit,
+    doneExerciseDelete: (ExerciseWithSets) -> Unit,
     exerciseWithSets: ExerciseWithSets,
     modifier: Modifier = Modifier
 ) {
@@ -135,7 +167,7 @@ private fun Exercise(
                 modifier = modifier.padding(10.dp)
             )
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = {  }) {
+            IconButton(onClick = { doneExerciseDelete(exerciseWithSets) }) {
                 Icon(Icons.Default.Close, "Delete")
             }
         }
@@ -189,7 +221,100 @@ private fun AttemptsList(
     }
 }
 
-@Preview(showBackground = true)
+@Composable
+private fun ExerciseToWorkoutAddDialog(
+    onAcceptRequest: (Exercise) -> Unit,
+    onDismissRequest: () -> Unit,
+    viewModel: WorkoutDetailsViewModel,
+    modifier: Modifier = Modifier
+) {
+    val searchQuery by viewModel.searchQuery
+    val searchResults by viewModel.searchResults
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(500.dp),
+            shape = MaterialTheme.shapes.large
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Заголовок
+                Text(
+                    text = "Добавить упражнение",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Поисковая строка
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = viewModel::onSearchQueryChanged,
+                    onSearch = {},
+                    active = false,
+                    onActiveChange = {},
+                    modifier = Modifier.fillMaxWidth()
+                ) {}
+
+                // Список результатов
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(searchResults) { exercise ->
+                        ExerciseSearchItem(
+                            exercise = exercise,
+                            onExerciseSelected = {
+                                onAcceptRequest(exercise)
+                                onDismissRequest()
+                            }
+                        )
+                    }
+
+                    if (searchResults.isEmpty()) {
+                        item {
+                            Text(
+                                text = if (searchQuery.isEmpty())
+                                    "Введите название упражнения"
+                                else
+                                    "Ничего не найдено",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExerciseSearchItem(
+    exercise: Exercise,
+    onExerciseSelected: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onExerciseSelected,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = exercise.name,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+/*@Preview(showBackground = true)
 @Composable
 fun WorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
@@ -230,4 +355,4 @@ fun NoWorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
         DetailsBody(navigateToEditWorkout = {_ -> }, exerciseList = listOf())
     }
-}
+}*/
