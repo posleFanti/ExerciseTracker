@@ -144,7 +144,7 @@ private fun WorkoutItem(
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         onClick = { toWorkoutDetails(workout.workoutId) }
     ) {
@@ -155,7 +155,7 @@ private fun WorkoutItem(
         ) {
             Column {
                 Text(
-                    text = "Тренировка " + workout.workoutId,
+                    text = workout.name,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
@@ -167,11 +167,11 @@ private fun WorkoutItem(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            Spacer(Modifier.weight(1f))
+            /*Spacer(Modifier.weight(1f))
             Image(
                 painter = painterResource(R.drawable.cardio_icon),
                 contentDescription = "cardio_icon"
-            )
+            )*/
         }
     }
 }

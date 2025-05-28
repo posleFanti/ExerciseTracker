@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.Card
@@ -80,6 +81,9 @@ fun ExercisesScreen(
                 query = searchQuery,
                 onQueryChange = viewModel::onSearchQueryChanged,
                 onSearch = { /* Можно добавить подтверждение поиска */ },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                },
                 active = false,
                 onActiveChange = {},
                 modifier = Modifier
