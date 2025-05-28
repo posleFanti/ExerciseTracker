@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -21,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -74,9 +76,11 @@ fun ExercisesScreen(
             }
         }
     ) { innerPadding ->
-        Column(modifier = modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
             SearchBar(
                 query = searchQuery,
                 onQueryChange = viewModel::onSearchQueryChanged,
@@ -88,7 +92,7 @@ fun ExercisesScreen(
                 onActiveChange = {},
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start=16.dp, end = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
             ) {
                 // Дополнительный контент при активации поиска
             }
@@ -109,6 +113,11 @@ fun ExercisesScreen(
                         items(items = exercises) { exercise ->
                             ExerciseCard(
                                 navigateToExerciseEdit = navigateToExerciseEdit,
+                                onDeleteExercise = {
+                                    coroutineScope.launch {
+                                        viewModel.deleteExercise(it)
+                                    }
+                                },
                                 exercise = exercise,
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -138,6 +147,7 @@ fun ExercisesScreen(
 @Composable
 fun ExerciseCard(
     navigateToExerciseEdit: (Long) -> Unit,
+    onDeleteExercise: (Exercise) -> Unit,
     exercise: Exercise,
     modifier: Modifier = Modifier
 ) {
@@ -150,10 +160,18 @@ fun ExerciseCard(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text(
-                text = exercise.name,
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Row (
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = exercise.name,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier.weight(1f))
+                IconButton(onClick = { onDeleteExercise(exercise) }) {
+                    Icon(Icons.Default.Close, "Delete")
+                }
+            }
         }
     }
 }
@@ -169,7 +187,7 @@ private fun ExerciseAddDialog(
     Dialog(
         onDismissRequest = onDismissRequest,
     ) {
-        Card (
+        Card(
             modifier = modifier
                 .fillMaxWidth()
                 .height(255.dp)
@@ -191,11 +209,11 @@ private fun ExerciseAddDialog(
                 maxLines = 1,
                 modifier = modifier.padding(10.dp),
             )
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier.padding(horizontal = 10.dp)
-            ){
+            ) {
                 TextButton(
                     onClick = { onAcceptRequest(exerciseName) },
                 ) { Text("Добавить") }

@@ -34,4 +34,7 @@ interface SetDao {
         ORDER BY workouts.date
     """)
     fun getExerciseStats(exerciseId: Long): Flow<List<DateMaxWeight>>
+
+    @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")
+    fun getAllSets(exerciseId: Long): Flow<List<Set>>
 }

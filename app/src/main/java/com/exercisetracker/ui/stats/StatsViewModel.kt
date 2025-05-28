@@ -1,7 +1,6 @@
 package com.exercisetracker.ui.stats
 
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.State
@@ -21,14 +20,12 @@ import co.yml.charts.ui.linechart.model.LineType
 import com.exercisetracker.data.entities.DateMaxWeight
 import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.data.repositories.WorkoutRepository
-import com.exercisetracker.ui.workouts.WorkoutsViewModel
 import com.exercisetracker.ui.workouts.trackerApplication
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.Date
 
 class StatsViewModel(
     private val workoutRepository: WorkoutRepository
@@ -55,7 +52,7 @@ class StatsViewModel(
                 .distinctUntilChanged()
                 .collect { query ->
                     _searchResults.value = if (query.isBlank()) emptyList()
-                    else workoutRepository.searchExercises("%$query%")
+                    else workoutRepository.searchExercisesFlow("%$query%").filterNotNull().first()
                 }
         }
     }

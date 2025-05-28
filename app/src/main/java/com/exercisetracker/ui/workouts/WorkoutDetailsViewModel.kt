@@ -29,6 +29,7 @@ class WorkoutDetailsViewModel(
     private val workoutRepository: WorkoutRepository
 ): ViewModel() {
     private val workoutId: Long = checkNotNull(savedStateHandle[WorkoutDetailsDestination.workoutIdArg])
+
     var uiState by mutableStateOf(WorkoutDetailsUiState())
         private set
 
@@ -40,10 +41,15 @@ class WorkoutDetailsViewModel(
 
     init {
         viewModelScope.launch {
-            uiState = workoutRepository.getWorkoutWithExercisesWithSets(workoutId)
-                    .toWorkoutDetailsUiState()
+            workoutRepository.getWorkoutWithExercisesWithSets(workoutId)
+                .collect { workoutData ->
+                    uiState = workoutData.toWorkoutDetailsUiState()
+                }
+        }
+
+        viewModelScope.launch {
             snapshotFlow { _searchQuery.value }
-                .debounce(300) // Задержка для уменьшения запросов
+                .debounce(300)
                 .distinctUntilChanged()
                 .collect { query ->
                     _searchResults.value = if (query.isBlank()) {
@@ -51,7 +57,8 @@ class WorkoutDetailsViewModel(
                             .filterNotNull()
                             .first()
                     } else {
-                        workoutRepository.searchExercises("%$query%")
+                        workoutRepository.searchExercisesFlow("%$query%")
+                            .filterNotNull().first()
                     }
                 }
         }
@@ -62,7 +69,7 @@ class WorkoutDetailsViewModel(
         val newSet = Set(
             exerciseId = exercise.exerciseId,
             workoutId = currentWorkoutId,
-            setNumber = 1, // Автоматическая нумерация
+            setNumber = 1,
             weight = 0.0,
             reps = 0
         )

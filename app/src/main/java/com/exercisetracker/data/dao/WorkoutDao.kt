@@ -30,9 +30,8 @@ interface WorkoutDao {
     @Query("SELECT * FROM workouts WHERE workout_id = :id ORDER BY type ASC")
     fun getWorkout(id: Long): Flow<Workout>
 
-    @Transaction
     @Query("SELECT * FROM workouts WHERE workout_id = :workoutId")
-    suspend fun getWorkoutWithExercisesAndSets(workoutId: Long): WorkoutWithExercisesWithSets
+    fun getWorkoutWithExercisesAndSets(workoutId: Long): Flow<WorkoutWithExercisesWithSets>
 
     @Transaction
     @Query("SELECT * FROM ExerciseWithSetsView WHERE exercise_id = :exerciseId AND workout_id = :workoutId ORDER BY set_number ASC")

@@ -34,6 +34,9 @@ class OfflineWorkoutRepository(
         exerciseId: Long
     ): Flow<List<Set>?> = setDao.getSets(workoutId, exerciseId)
 
+    override fun getAllSets(exerciseId: Long): Flow<List<Set>> =
+        setDao.getAllSets(exerciseId)
+
     override fun getAllExercises(): Flow<List<Exercise>> =
         exerciseDao.getAllExercises()
 
@@ -43,7 +46,7 @@ class OfflineWorkoutRepository(
     override fun getExerciseStats(exerciseId: Long): Flow<List<DateMaxWeight>> =
         setDao.getExerciseStats(exerciseId)
 
-    override suspend fun getWorkoutWithExercisesWithSets(workoutId: Long): WorkoutWithExercisesWithSets =
+    override suspend fun getWorkoutWithExercisesWithSets(workoutId: Long): Flow<WorkoutWithExercisesWithSets> =
         workoutDao.getWorkoutWithExercisesAndSets(workoutId)
 
     override suspend fun getExerciseWithSetsView(
@@ -66,6 +69,9 @@ class OfflineWorkoutRepository(
     override suspend fun deleteSet(set: Set) =
         setDao.delete(set)
 
+    override suspend fun deleteExercise(exercise: Exercise) =
+        exerciseDao.delete(exercise)
+
     override suspend fun updateWorkout(workout: Workout) =
         workoutDao.update(workout)
 
@@ -75,8 +81,8 @@ class OfflineWorkoutRepository(
     override suspend fun updateSet(set: Set) =
         setDao.update(set)
 
-    override suspend fun searchExercises(query: String): List<Exercise> =
-        exerciseDao.searchExercises(query)
+    override suspend fun searchExercisesFlow(query: String): Flow<List<Exercise>> =
+        exerciseDao.searchExercisesFlow(query)
 
     override suspend fun runInTransaction(block: suspend () -> Unit) {
         withContext(Dispatchers.IO) {

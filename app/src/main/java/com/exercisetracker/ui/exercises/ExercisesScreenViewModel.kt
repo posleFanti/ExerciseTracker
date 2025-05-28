@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 
 class ExerciseSearchViewModel(
@@ -32,14 +35,15 @@ class ExerciseSearchViewModel(
             snapshotFlow { _searchQuery.value }
                 .debounce(300) // Задержка для уменьшения запросов
                 .distinctUntilChanged()
-                .collect { query ->
-                    _searchResults.value = if (query.isBlank()) {
+                .flatMapLatest { query ->
+                    if (query.isBlank()) {
                         workoutRepository.getAllExercises()
-                            .filterNotNull()
-                            .first()
                     } else {
-                        workoutRepository.searchExercises("%$query%")
+                        workoutRepository.searchExercisesFlow("%$query%")
                     }
+                }
+                .collect { exercises ->
+                    _searchResults.value = exercises
                 }
         }
     }
@@ -49,7 +53,21 @@ class ExerciseSearchViewModel(
     }
 
     suspend fun addExercise(exercise: Exercise) {
-       workoutRepository.insertExercise(exercise)
+        workoutRepository.insertExercise(exercise)
+        if (_searchQuery.value.isBlank()) {
+            _searchResults.value = workoutRepository.getAllExercises().first()
+        }
+    }
+
+    suspend fun deleteExercise(exercise: Exercise) {
+        val sets = workoutRepository.getAllSets(exerciseId = exercise.exerciseId)
+            .filterNotNull()
+            .first()
+        sets.forEach { set ->
+            workoutRepository.deleteSet(set)
+        }
+
+        workoutRepository.deleteExercise(exercise)
     }
 
     companion object {

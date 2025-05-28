@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.data.entities.Exercise
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 
 class DoneExerciseEditViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository
+    private val workoutRepository: WorkoutRepository,
 ): ViewModel() {
     private val workoutId: Long = checkNotNull(savedStateHandle[DoneExerciseEditDestination.workoutIdArg])
     private val exerciseId: Long = checkNotNull(savedStateHandle[DoneExerciseEditDestination.exerciseIdArg])
@@ -118,6 +119,8 @@ class DoneExerciseEditViewModel(
                     workoutRepository.insertSet(set.copy(setId = 0)) // Сбрасываем ID для создания нового
                 }
             }
+
+
         }
     }
 
@@ -127,7 +130,7 @@ class DoneExerciseEditViewModel(
             initializer {
                 DoneExerciseEditViewModel(
                     this.createSavedStateHandle(),
-                    workoutRepository = trackerApplication().container.workoutRepository
+                    workoutRepository = trackerApplication().container.workoutRepository,
                 )
             }
         }

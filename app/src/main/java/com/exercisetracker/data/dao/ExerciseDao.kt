@@ -28,7 +28,7 @@ interface ExerciseDao {
     fun getAllExercises(): Flow<List<Exercise>>
 
     @Query("SELECT * FROM exercises WHERE exercise_name LIKE :query")
-    suspend fun searchExercises(query: String): List<Exercise>
+    fun searchExercisesFlow(query: String): Flow<List<Exercise>>
 
     /*@Transaction
     @Query("SELECT * FROM exercises WHERE exercise_id = :id")
