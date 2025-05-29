@@ -1,6 +1,5 @@
 package com.exercisetracker.data.repositories
 
-import androidx.compose.ui.text.TextLayoutResult
 import com.exercisetracker.data.dao.ExerciseDao
 import com.exercisetracker.data.dao.SetDao
 import com.exercisetracker.data.dao.WorkoutDao
@@ -10,7 +9,6 @@ import com.exercisetracker.data.entities.ExerciseWithSetsView
 import com.exercisetracker.data.entities.Set
 import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.data.entities.WorkoutWithExercisesWithSets
-import com.exercisetracker.ui.workouts.ExerciseWithSets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -29,13 +27,16 @@ class OfflineWorkoutRepository(
     override fun getWorkoutStream(id: Long): Flow<Workout?> =
         workoutDao.getWorkout(id)
 
+    override fun getSetsByWorkoutId(workoutId: Long): Flow<List<Set>> =
+        setDao.getSetsByWorkoutId(workoutId)
+
     override fun getSets(
         workoutId: Long,
         exerciseId: Long
     ): Flow<List<Set>?> = setDao.getSets(workoutId, exerciseId)
 
     override fun getAllSets(exerciseId: Long): Flow<List<Set>> =
-        setDao.getAllSets(exerciseId)
+        setDao.getSetsByExerciseId(exerciseId)
 
     override fun getAllExercises(): Flow<List<Exercise>> =
         exerciseDao.getAllExercises()

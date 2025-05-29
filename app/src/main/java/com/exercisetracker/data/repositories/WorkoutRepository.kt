@@ -14,6 +14,7 @@ interface WorkoutRepository {
     fun getAllWorkoutsStream(): Flow<List<Workout>>
     //fun getWorkoutWithExercisesStream(id: Long): Flow<WorkoutWithExercises?>
     fun getWorkoutStream(id: Long): Flow<Workout?>
+    fun getSetsByWorkoutId(workoutId: Long): Flow<List<Set>>
     fun getSets(workoutId: Long, exerciseId: Long): Flow<List<Set>?>
     fun getAllSets(exerciseId: Long): Flow<List<Set>>
     fun getAllExercises(): Flow<List<Exercise>>

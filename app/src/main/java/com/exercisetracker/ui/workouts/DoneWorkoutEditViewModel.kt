@@ -39,7 +39,15 @@ class DoneExerciseEditViewModel(
     }
 
     private fun validateInput(doneExerciseDetails: DoneExerciseDetails): Boolean {
-        return true
+        try {
+            doneExerciseDetails.sets.forEach { set ->
+                set.reps.toInt()
+                set.weight.toDouble()
+            }
+            return true
+        } catch (e: Exception) {
+            return false
+        }
     }
 
     fun updateUiState(doneExerciseDetails: DoneExerciseDetails) {
@@ -50,7 +58,7 @@ class DoneExerciseEditViewModel(
     }
 
     fun addSet() {
-        val currentSets = doneExerciseEditUiState.doneExerciseDetails.sets
+        val currentSets = doneExerciseEditUiState.doneExerciseDetails.sets.map { set -> set.toSet() }
         val lastSet = currentSets.lastOrNull()
 
         val newSetNumber = (lastSet?.setNumber ?: 0) + 1
@@ -65,7 +73,7 @@ class DoneExerciseEditViewModel(
         )
 
         val updatedDetails = doneExerciseEditUiState.doneExerciseDetails.copy(
-            sets = currentSets + newSet
+            sets = currentSets.toSetsDetails() + newSet.toSetDetails()
         )
 
         doneExerciseEditUiState = doneExerciseEditUiState.copy(
@@ -75,7 +83,7 @@ class DoneExerciseEditViewModel(
     }
 
     fun removeSet(setNumber: Int) {
-        val currentSets = doneExerciseEditUiState.doneExerciseDetails.sets
+        val currentSets = doneExerciseEditUiState.doneExerciseDetails.sets.map { set -> set.toSet() }
 
         // Удаляем подход с указанным номером
         val filteredSets = currentSets.filterNot { it.setNumber == setNumber }
@@ -86,7 +94,7 @@ class DoneExerciseEditViewModel(
         }
 
         val updatedDetails = doneExerciseEditUiState.doneExerciseDetails.copy(
-            sets = reorderedSets
+            sets = reorderedSets.map { set -> set.toSetDetails() }
         )
 
         doneExerciseEditUiState = doneExerciseEditUiState.copy(
@@ -100,7 +108,7 @@ class DoneExerciseEditViewModel(
             val details = doneExerciseEditUiState.doneExerciseDetails
 
             // Обновляем упражнение
-            workoutRepository.updateExercise(details.exercise)
+            workoutRepository.updateExercise(details.exercise.toExercise())
             Log.d("ViewModel", "exerciseId: $exerciseId, workoutId: $workoutId")
 
             // Получаем текущие подходы из базы данных
@@ -116,11 +124,9 @@ class DoneExerciseEditViewModel(
 
                 // Добавляем все новые подходы
                 details.sets.forEach { set ->
-                    workoutRepository.insertSet(set.copy(setId = 0)) // Сбрасываем ID для создания нового
+                    workoutRepository.insertSet(set.copy(setId=0).toSet()) // Сбрасываем ID для создания нового
                 }
             }
-
-
         }
     }
 
@@ -143,14 +149,75 @@ data class DoneExerciseEditUiState(
 )
 
 data class DoneExerciseDetails(
-    val exercise: Exercise = Exercise(),
-    val sets: List<Set> = listOf()
+    val exercise: ExerciseDetails = ExerciseDetails(),
+    val sets: List<SetDetails> = listOf()
+)
+
+data class ExerciseDetails(
+    val exerciseId: Long = 0,
+    val name: String = "",
+    val image: ByteArray? = null
+)
+
+data class SetDetails(
+    val setId: Long = 0,
+    val setNumber: String = "",
+    val workoutId: Long = 0,
+    val exerciseId: Long = 0,
+    val reps: String = "",
+    val weight: String = ""
 )
 
 fun List<ExerciseWithSetsView>.toDoneExerciseEditUiState(isEntryValid: Boolean = false): DoneExerciseEditUiState {
     val exerciseWithSets = groupExercisesWithSets(this).first()
     return DoneExerciseEditUiState(
-        doneExerciseDetails = DoneExerciseDetails(exercise = exerciseWithSets.exercise, sets = exerciseWithSets.sets),
+        doneExerciseDetails = DoneExerciseDetails(
+            exercise = exerciseWithSets.exercise.toExerciseDetails(),
+            sets = exerciseWithSets.sets.toSetsDetails()
+        ),
         isEntryValid = isEntryValid
     )
 }
+
+fun Exercise.toExerciseDetails(): ExerciseDetails = ExerciseDetails(
+    exerciseId = this.exerciseId,
+    name = this.name,
+    image = image
+)
+
+fun List<Set>.toSetsDetails(): List<SetDetails> {
+    return this.map { set ->
+        SetDetails(
+            setId = set.setId,
+            workoutId = set.workoutId,
+            exerciseId = set.exerciseId,
+            setNumber = set.setNumber.toString(),
+            reps = set.reps.toString(),
+            weight = set.weight.toString()
+        )
+    }
+}
+
+fun ExerciseDetails.toExercise(): Exercise = Exercise(
+    exerciseId = exerciseId,
+    name = name,
+    image = image
+)
+
+fun SetDetails.toSet(): Set = Set(
+    setId = setId,
+    exerciseId = exerciseId,
+    workoutId = workoutId,
+    setNumber = setNumber.toInt(),
+    reps = reps.toInt(),
+    weight = weight.toDouble()
+)
+
+fun Set.toSetDetails(): SetDetails = SetDetails(
+    setId = setId,
+    exerciseId = exerciseId,
+    workoutId = workoutId,
+    setNumber = setNumber.toString(),
+    reps = reps.toString(),
+    weight = weight.toString()
+)

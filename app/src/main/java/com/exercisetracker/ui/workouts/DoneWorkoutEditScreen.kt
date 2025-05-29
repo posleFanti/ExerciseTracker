@@ -125,7 +125,7 @@ private fun SetsInputForm(
     ) {
         items(items = uiState.doneExerciseDetails.sets, key = { it.setNumber }) { item ->
            InputRow(
-                setNumber = item.setNumber,
+                setNumber = item.setNumber.toInt(),
                 onRemoveSet = onRemoveSet,
                 doneExerciseDetails = uiState.doneExerciseDetails,
                 onValueChange = onValueChange,
@@ -169,15 +169,15 @@ private fun InputRow(
     }
 }
 
-private fun changeReps(newValue: String, sets: List<Set>, setNumber: Int): List<Set> {
+private fun changeReps(newValue: String, sets: List<SetDetails>, setNumber: Int): List<SetDetails> {
     return sets.map { item ->
-        if (item.setNumber == setNumber) item.copy(reps = if (newValue.isBlank()) 0 else newValue.toInt()) else item
+        if (item.setNumber.toInt() == setNumber) item.copy(reps = newValue) else item
     }
 }
 
-private fun changeWeight(newValue: String, sets: List<Set>, setNumber: Int): List<Set> {
+private fun changeWeight(newValue: String, sets: List<SetDetails>, setNumber: Int): List<SetDetails> {
     return sets.map { item ->
-        if (item.setNumber == setNumber) item.copy(weight = if (newValue.isBlank()) 0.0 else newValue.toDouble()) else item
+        if (item.setNumber.toInt() == setNumber) item.copy(weight = newValue) else item
     }
 }
 
@@ -190,7 +190,7 @@ fun InputRowPreview() {
             setNumber = 1,
             onRemoveSet = {},
             doneExerciseDetails = DoneExerciseDetails(
-                sets = listOf(Set(0,0,0,1,27.4,10))
+                sets = listOf(Set(0,0,0,1,27.4,10).toSetDetails())
             ),
             onValueChange = { _ -> },
         )

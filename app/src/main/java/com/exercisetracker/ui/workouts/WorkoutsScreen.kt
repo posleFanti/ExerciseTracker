@@ -2,6 +2,7 @@
 
 package com.exercisetracker.ui.workouts
 
+import android.widget.Space
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,12 +19,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -125,6 +129,13 @@ fun WorkoutScreen(
                 }
             },
             onDismissRequest = { showEditDialog = false },
+            onDeleteWorkout = {
+                coroutineScope.launch {
+                    viewModel.deleteWorkout(it)
+                    showEditDialog = false
+                    workoutToEdit = null
+                }
+            },
             workout = workoutToEdit!!,
             modifier = modifier
         )
@@ -292,6 +303,7 @@ private fun WorkoutAddDialog(
 private fun WorkoutEditDialog(
     onAcceptRequest: (String, String, String) -> Unit,
     onDismissRequest: () -> Unit,
+    onDeleteWorkout: (Workout) -> Unit,
     workout: Workout,
     modifier: Modifier = Modifier,
 ) {
@@ -305,18 +317,30 @@ private fun WorkoutEditDialog(
         Card (
             modifier = modifier
                 .fillMaxWidth()
-                .height(370.dp)
+                .height(365.dp)
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(20.dp),
         ) {
-            Text(
-                text = "Изменить тренировку",
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp)
-            )
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(top=7.dp)
+            ) {
+                Text(
+                    text = "Изменить тренировку",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Start,
+                    modifier = modifier
+                        .padding(start = 14.dp)
+                )
+                Spacer(modifier.weight(1f))
+                IconButton(
+                    onClick = { onDeleteWorkout(workout) },
+                    modifier = Modifier.padding(end = 5.dp)
+                ) {
+                    Icon(Icons.Default.Delete, "Delete")
+                }
+            }
             OutlinedTextField(
                 value = workoutName,
                 onValueChange = { workoutName = it },
@@ -390,6 +414,6 @@ fun WorkoutAddDialogPreview() {
 @Composable
 fun WorkoutEditDialogPreview() {
     ExerciseTrackerTheme {
-        WorkoutEditDialog(onAcceptRequest = { _, _, _ -> }, onDismissRequest = {}, workout = Workout(0, "Название", "Кардио", "2025-05-10"))
+        WorkoutEditDialog(onAcceptRequest = { _, _, _ -> }, onDismissRequest = {}, { _ -> }, workout = Workout(0, "Название", "Кардио", "2025-05-10"))
     }
 }

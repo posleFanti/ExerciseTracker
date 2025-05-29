@@ -12,6 +12,8 @@ import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.data.repositories.WorkoutRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -32,6 +34,16 @@ class WorkoutsViewModel(
 
     suspend fun updateWorkout(workout: Workout) {
         workoutRepository.updateWorkout(workout)
+    }
+
+    suspend fun deleteWorkout(workout: Workout) {
+        workoutRepository.runInTransaction {
+            workoutRepository.getSetsByWorkoutId(workout.workoutId).filterNotNull().first().forEach { set ->
+                workoutRepository.deleteSet(set)
+            }
+        }
+
+        workoutRepository.deleteWorkout(workout)
     }
 
     companion object {
