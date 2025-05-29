@@ -2,6 +2,7 @@
 
 package com.exercisetracker
 
+import android.media.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,6 +29,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -87,20 +91,20 @@ fun BottomNavBar(
         BottomNavItem(
             title = "Тренировки",
             route = WorkoutsDestination.route,
-            selectedIcon = Icons.Filled.Face,
-            unselectedIcon = Icons.Outlined.Face
+            selectedIcon = ImageVector.vectorResource(R.drawable.workout_day),
+            unselectedIcon = ImageVector.vectorResource(R.drawable.workout_day)
         ),
         BottomNavItem(
             title = "Упражнения",
             route = ExercisesDestination.route,
-            selectedIcon = Icons.Filled.List,
-            unselectedIcon = Icons.Outlined.List
+            selectedIcon = ImageVector.vectorResource(R.drawable.workout_list),
+            unselectedIcon = ImageVector.vectorResource(R.drawable.workout_list)
         ),
         BottomNavItem(
             title = "Статистика",
             route = StatsDestination.route,
-            selectedIcon = Icons.Filled.Info,
-            unselectedIcon = Icons.Outlined.Info
+            selectedIcon = ImageVector.vectorResource(R.drawable.statistics_graphic_selected),
+            unselectedIcon = ImageVector.vectorResource(R.drawable.statistics_graph_unselected)
         )
     )
 
