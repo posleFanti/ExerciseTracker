@@ -2,7 +2,10 @@
 
 package com.exercisetracker.ui.workouts
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +38,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.yml.charts.common.extensions.isNotNull
 import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.Workout
@@ -63,6 +69,8 @@ fun WorkoutScreen(
     viewModel: WorkoutsViewModel = viewModel(factory = WorkoutsViewModel.Factory)
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    var workoutToEdit by remember { mutableStateOf<Workout?>(null) }
     val workoutsUiState by viewModel.workoutsUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -77,7 +85,15 @@ fun WorkoutScreen(
             }
         }
     ) { innerPadding ->
-        Body(workoutsUiState.workoutList, toWorkoutDetails = toWorkoutDetails, modifier = modifier.padding(innerPadding))
+        Body(
+            workoutsUiState.workoutList,
+            toWorkoutDetails = toWorkoutDetails,
+            onWorkoutLongClick = { workout ->
+                workoutToEdit = workout
+                showEditDialog = true
+            },
+            modifier = modifier.padding(innerPadding)
+        )
     }
 
     if (showAddDialog) {
@@ -92,12 +108,34 @@ fun WorkoutScreen(
             modifier = modifier
         )
     }
+
+    if (showEditDialog && workoutToEdit != null) {
+        WorkoutEditDialog(
+            onAcceptRequest = { name, type, date ->
+                coroutineScope.launch {
+                    viewModel.updateWorkout(
+                        Workout(
+                            workoutId = workoutToEdit!!.workoutId,
+                            name = name,
+                            type = type,
+                            date = date
+                        )
+                    )
+                    showEditDialog = false
+                }
+            },
+            onDismissRequest = { showEditDialog = false },
+            workout = workoutToEdit!!,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
 private fun Body(
     workoutList: List<Workout>,
     toWorkoutDetails: (Long) -> Unit,
+    onWorkoutLongClick: (Workout) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -111,6 +149,7 @@ private fun Body(
             WorkoutList(
                 workoutList,
                 toWorkoutDetails,
+                onWorkoutLongClick,
                 modifier
             )
         }
@@ -121,6 +160,7 @@ private fun Body(
 private fun WorkoutList(
     workoutList: List<Workout>,
     toWorkoutDetails: (Long) -> Unit,
+    onWorkoutLongClick: (Workout) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -130,6 +170,7 @@ private fun WorkoutList(
             WorkoutItem(
                 workout = item,
                 toWorkoutDetails = toWorkoutDetails,
+                onWorkoutLongClick = onWorkoutLongClick,
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -137,16 +178,25 @@ private fun WorkoutList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WorkoutItem(
     workout: Workout,
     toWorkoutDetails: (Long) -> Unit,
+    onWorkoutLongClick: (Workout) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptics = LocalHapticFeedback.current
+
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().combinedClickable(
+            onClick = { toWorkoutDetails(workout.workoutId) },
+            onLongClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                onWorkoutLongClick(workout)
+            }
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-        onClick = { toWorkoutDetails(workout.workoutId) }
     ) {
         Row(
             modifier = modifier.padding(20.dp),
@@ -182,8 +232,8 @@ private fun WorkoutAddDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var workoutType by remember { mutableStateOf("Тип тренировки") }
-    var workoutName by remember { mutableStateOf("Название тренировки") }
+    var workoutType by remember { mutableStateOf("") }
+    var workoutName by remember { mutableStateOf("") }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     Dialog(
@@ -238,6 +288,75 @@ private fun WorkoutAddDialog(
     }
 }
 
+@Composable
+private fun WorkoutEditDialog(
+    onAcceptRequest: (String, String, String) -> Unit,
+    onDismissRequest: () -> Unit,
+    workout: Workout,
+    modifier: Modifier = Modifier,
+) {
+    var workoutType by remember { mutableStateOf(workout.type) }
+    var workoutName by remember { mutableStateOf(workout.name) }
+    var workoutDate by remember { mutableStateOf(workout.date) }
+
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Card (
+            modifier = modifier
+                .fillMaxWidth()
+                .height(370.dp)
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(20.dp),
+        ) {
+            Text(
+                text = "Изменить тренировку",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp)
+            )
+            OutlinedTextField(
+                value = workoutName,
+                onValueChange = { workoutName = it },
+                label = { Text("Название") },
+                maxLines = 1,
+                modifier = modifier.padding(10.dp),
+            )
+            OutlinedTextField(
+                value = workoutType,
+                onValueChange = { workoutType = it },
+                label = { Text("Тип") },
+                maxLines = 1,
+                modifier = modifier.padding(10.dp),
+            )
+            OutlinedTextField(
+                value = workoutDate,
+                onValueChange = { workoutDate = it },
+                label = { Text("Дата") },
+                maxLines = 1,
+                modifier = modifier.padding(10.dp),
+            )
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.padding(horizontal = 10.dp)
+            ){
+                TextButton(
+                    onClick = {
+                       onAcceptRequest(workoutName, workoutType, workoutDate)
+                    },
+                ) { Text("Сохранить") }
+                Spacer(modifier.weight(1f))
+                TextButton(
+                    onClick = { onDismissRequest() },
+                ) { Text("Отмена") }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun WorkoutListPreview() {
@@ -247,7 +366,7 @@ fun WorkoutListPreview() {
         Workout(workoutId = 2, name = "Название", type = "Силовая", date = "2025-05-15"),
     )
     ExerciseTrackerTheme {
-        WorkoutList(list, {})
+        WorkoutList(list, {}, {})
     }
 }
 
@@ -255,7 +374,7 @@ fun WorkoutListPreview() {
 @Composable
 fun WorkoutItemPreview() {
     ExerciseTrackerTheme {
-        WorkoutItem(Workout(name = "Название", type = "Силовая", date = "2025-05-05"), {})
+        WorkoutItem(Workout(name = "Название", type = "Силовая", date = "2025-05-05"), {}, {})
     }
 }
 
@@ -264,5 +383,13 @@ fun WorkoutItemPreview() {
 fun WorkoutAddDialogPreview() {
     ExerciseTrackerTheme {
         WorkoutAddDialog(onAcceptRequest = { _, _, _ -> }, onDismissRequest = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WorkoutEditDialogPreview() {
+    ExerciseTrackerTheme {
+        WorkoutEditDialog(onAcceptRequest = { _, _, _ -> }, onDismissRequest = {}, workout = Workout(0, "Название", "Кардио", "2025-05-10"))
     }
 }

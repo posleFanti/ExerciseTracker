@@ -1,5 +1,7 @@
 package com.exercisetracker.ui.exercises
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +18,7 @@ import com.exercisetracker.ui.workouts.trackerApplication
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 class ExerciseEditViewModel(
     savedStateHandle: SavedStateHandle,
@@ -39,6 +42,25 @@ class ExerciseEditViewModel(
         exerciseUiState = ExerciseUiState(exerciseDetails)
     }
 
+    fun updateImage(bitmap: Bitmap?) {
+        val imageByteArray = bitmap?.let { bitmapToByteArray(it) }
+        exerciseUiState = exerciseUiState.copy(
+            exerciseDetails = exerciseUiState.exerciseDetails.copy(image = imageByteArray)
+        )
+    }
+
+    fun clearImage() {
+        exerciseUiState = exerciseUiState.copy(
+            exerciseDetails = exerciseUiState.exerciseDetails.copy(image = null)
+        )
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+        return stream.toByteArray()
+    }
+
     suspend fun updateExercise() {
         workoutRepository.updateExercise(exerciseUiState.exerciseDetails.toExercise())
     }
@@ -58,7 +80,8 @@ class ExerciseEditViewModel(
 
 data class ExerciseDetails(
     val exerciseId: Long = 0,
-    val name: String = ""
+    val name: String = "",
+    val image: ByteArray? = null
 )
 
 data class ExerciseUiState(
@@ -67,10 +90,20 @@ data class ExerciseUiState(
 
 fun Exercise.toExerciseUiState(): ExerciseUiState = ExerciseUiState(ExerciseDetails(
     exerciseId = this.exerciseId,
-    name = this.name
+    name = this.name,
+    image = image
 ))
 
 fun ExerciseDetails.toExercise(): Exercise = Exercise(
     exerciseId = this.exerciseId,
-    name = this.name
+    name = this.name,
+    image = image
 )
+
+fun ByteArray.toBitmap(): Bitmap? {
+    return try {
+        BitmapFactory.decodeByteArray(this, 0, this.size)
+    } catch (e: Exception) {
+        null
+    }
+}

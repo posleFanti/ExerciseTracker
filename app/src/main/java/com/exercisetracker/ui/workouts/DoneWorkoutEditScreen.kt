@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -143,9 +144,10 @@ private fun InputRow(
     modifier: Modifier = Modifier
 ) {
     Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Text(text = setNumber.toString())
+        Text(text = setNumber.toString(), modifier = Modifier.padding(10.dp))
         OutlinedTextField(
             value = doneExerciseDetails.sets[setNumber-1].reps.toString(),
             onValueChange = { onValueChange(doneExerciseDetails.copy(sets = changeReps(it, doneExerciseDetails.sets, setNumber))) },
@@ -153,7 +155,7 @@ private fun InputRow(
             singleLine = true,
             modifier = Modifier.width(150.dp)
         )
-        Spacer(Modifier.size(30.dp))
+        Spacer(Modifier.size(20.dp))
         OutlinedTextField(
             value = doneExerciseDetails.sets[setNumber-1].weight.toString(),
             onValueChange = { onValueChange(doneExerciseDetails.copy(sets = changeWeight(it, doneExerciseDetails.sets, setNumber)))},

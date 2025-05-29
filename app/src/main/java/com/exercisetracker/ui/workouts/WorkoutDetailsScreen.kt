@@ -31,6 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,7 +72,7 @@ fun WorkoutDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = "Тренировка " + uiState.workout.name,
+                title = uiState.workout.name,
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
@@ -251,6 +253,9 @@ private fun ExerciseToWorkoutAddDialog(
                     query = searchQuery,
                     onQueryChange = viewModel::onSearchQueryChanged,
                     onSearch = {},
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                    },
                     active = false,
                     onActiveChange = {},
                     modifier = Modifier.fillMaxWidth()

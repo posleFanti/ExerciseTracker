@@ -19,7 +19,7 @@ import com.exercisetracker.data.entities.Workout
         Set::class,
     ],
     views = [ExerciseWithSetsView::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

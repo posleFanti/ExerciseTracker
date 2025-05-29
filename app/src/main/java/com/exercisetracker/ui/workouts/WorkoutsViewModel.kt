@@ -30,6 +30,10 @@ class WorkoutsViewModel(
         workoutRepository.insertWorkout(workout)
     }
 
+    suspend fun updateWorkout(workout: Workout) {
+        workoutRepository.updateWorkout(workout)
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
         val Factory: ViewModelProvider.Factory = viewModelFactory {
