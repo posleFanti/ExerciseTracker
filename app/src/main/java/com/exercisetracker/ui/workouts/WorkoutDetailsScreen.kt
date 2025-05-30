@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,9 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,8 +53,6 @@ object WorkoutDetailsDestination : NavigationDestination {
     val routeWithArgs = "$route/{$workoutIdArg}"
 }
 
-// TODO:    Add navigation to edit workout
-
 @Composable
 fun WorkoutDetailsScreen(
     navigateToEditWorkout: (Long) -> Unit,
@@ -66,6 +61,8 @@ fun WorkoutDetailsScreen(
     viewModel: WorkoutDetailsViewModel = viewModel(factory = WorkoutDetailsViewModel.Factory)
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
+    val searchQuery by viewModel.searchQuery
+    val searchResults by viewModel.searchResults
     val uiState = viewModel.uiState
     val coroutineScope = rememberCoroutineScope()
 
@@ -106,7 +103,9 @@ fun WorkoutDetailsScreen(
                 }
             },
             onDismissRequest = { showAddDialog = false },
-            viewModel = viewModel,
+            onSearchQueryChanged = viewModel::onSearchQueryChanged,
+            searchQuery = searchQuery,
+            searchResults = searchResults,
             modifier = modifier
         )
     }
@@ -229,12 +228,11 @@ private fun AttemptsList(
 private fun ExerciseToWorkoutAddDialog(
     onAcceptRequest: (Exercise) -> Unit,
     onDismissRequest: () -> Unit,
-    viewModel: WorkoutDetailsViewModel,
+    onSearchQueryChanged: (String) -> Unit,
+    searchQuery: String,
+    searchResults: List<Exercise>,
     modifier: Modifier = Modifier
 ) {
-    val searchQuery by viewModel.searchQuery
-    val searchResults by viewModel.searchResults
-
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
             modifier = modifier
@@ -246,21 +244,23 @@ private fun ExerciseToWorkoutAddDialog(
                 // Заголовок
                 Text(
                     text = "Добавить упражнение",
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
                 )
 
                 // Поисковая строка
                 SearchBar(
                     query = searchQuery,
-                    onQueryChange = viewModel::onSearchQueryChanged,
+                    onQueryChange = onSearchQueryChanged,
                     onSearch = {},
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                     },
                     active = false,
                     onActiveChange = {},
-                    modifier = Modifier.fillMaxWidth()
+                    placeholder = { Text("Поиск упражнений...") },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp)
                 ) {}
 
                 // Список результатов
@@ -321,12 +321,13 @@ private fun ExerciseSearchItem(
     }
 }
 
-/*@Preview(showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun WorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
         DetailsBody(
             navigateToEditWorkout = { _ -> },
+            doneExerciseDelete = {},
             exerciseList = listOf(
                 ExerciseWithSets(
                     exercise = Exercise(0, "Название упражнения"),
@@ -351,7 +352,8 @@ fun ExerciseListPreview() {
                     exercise = Exercise(1, "Название упражнения 2"),
                     sets = listOf(Set(0, 0, 0, 1, 40.8, 15), Set(1, 0, 0, 2, 40.8, 15))
                 )
-            )
+            ),
+            doneExerciseDelete = {}
         )
     }
 }
@@ -360,6 +362,24 @@ fun ExerciseListPreview() {
 @Composable
 fun NoWorkoutDetailsBodyPreview() {
     ExerciseTrackerTheme {
-        DetailsBody(navigateToEditWorkout = {_ -> }, exerciseList = listOf())
+        DetailsBody(
+            navigateToEditWorkout = {_ -> },
+            doneExerciseDelete = {},
+            exerciseList = listOf()
+        )
     }
-}*/
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExerciseToWorkoutAddDialogPreview() {
+    ExerciseTrackerTheme {
+        ExerciseToWorkoutAddDialog(
+            onAcceptRequest = {},
+            onDismissRequest = {},
+            searchQuery = "",
+            searchResults = listOf(Exercise(1, "Exercise1")),
+            onSearchQueryChanged = {}
+        )
+    }
+}

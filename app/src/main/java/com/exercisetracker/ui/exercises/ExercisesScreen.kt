@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,6 +45,7 @@ import com.exercisetracker.R
 import com.exercisetracker.TopAppBar
 import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.ui.navigation.NavigationDestination
+import com.exercisetracker.ui.theme.ExerciseTrackerTheme
 import kotlinx.coroutines.launch
 
 object ExercisesDestination : NavigationDestination {
@@ -76,58 +78,18 @@ fun ExercisesScreen(
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = viewModel::onSearchQueryChanged,
-                onSearch = { /* Можно добавить подтверждение поиска */ },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-                },
-                active = false,
-                onActiveChange = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-                // Дополнительный контент при активации поиска
-            }
-
-            when {
-                exercises.isEmpty() -> {
-                    Text(
-                        text = "Ничего не найдено",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
+        ExerciseScreenBody(
+            searchQuery = searchQuery,
+            exercises = exercises,
+            onSearchQueryChanged = viewModel::onSearchQueryChanged,
+            navigateToExerciseEdit = navigateToExerciseEdit,
+            onDeleteExercise = {
+                coroutineScope.launch {
+                    viewModel.deleteExercise(it)
                 }
-
-                else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(items = exercises) { exercise ->
-                            ExerciseCard(
-                                navigateToExerciseEdit = navigateToExerciseEdit,
-                                onDeleteExercise = {
-                                    coroutineScope.launch {
-                                        viewModel.deleteExercise(it)
-                                    }
-                                },
-                                exercise = exercise,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                                    .fillMaxWidth()
-                            )
-                        }
-                    }
-                }
-            }
-        }
+            },
+            modifier = modifier.padding(innerPadding)
+        )
     }
 
     if (showAddDialog) {
@@ -141,6 +103,64 @@ fun ExercisesScreen(
             onDismissRequest = { showAddDialog = false },
             modifier = modifier
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExerciseScreenBody(
+    searchQuery: String,
+    exercises: List<Exercise>,
+    onSearchQueryChanged: (String) -> Unit,
+    navigateToExerciseEdit: (Long) -> Unit,
+    onDeleteExercise: (Exercise) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = onSearchQueryChanged,
+            onSearch = {},
+            leadingIcon = {
+                Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+            },
+            active = false,
+            onActiveChange = {},
+            placeholder = { Text("Поиск упражнений...") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
+        ) {}
+
+        when {
+            exercises.isEmpty() -> {
+                Text(
+                    text = "Ничего не найдено",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            else -> {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 20.dp)) {
+                    items(items = exercises) { exercise ->
+                        ExerciseCard(
+                            navigateToExerciseEdit = navigateToExerciseEdit,
+                            onDeleteExercise = onDeleteExercise,
+                            exercise = exercise,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -182,7 +202,7 @@ private fun ExerciseAddDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var exerciseName by remember { mutableStateOf("Название упражнения") }
+    var exerciseName by remember { mutableStateOf("") }
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -190,7 +210,7 @@ private fun ExerciseAddDialog(
         Card(
             modifier = modifier
                 .fillMaxWidth()
-                .height(255.dp)
+                .height(195.dp)
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(20.dp),
         ) {
@@ -206,8 +226,8 @@ private fun ExerciseAddDialog(
                 value = exerciseName,
                 onValueChange = { exerciseName = it },
                 label = { Text("Название") },
-                maxLines = 1,
-                modifier = modifier.padding(10.dp),
+                singleLine = true,
+                modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
             )
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -223,5 +243,30 @@ private fun ExerciseAddDialog(
                 ) { Text("Отмена") }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExerciseScreenBodyPreview() {
+    ExerciseTrackerTheme {
+        ExerciseScreenBody(
+            searchQuery = "",
+            exercises = listOf(),
+            onSearchQueryChanged = {},
+            navigateToExerciseEdit = {},
+            onDeleteExercise = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExerciseAddDialogPreview() {
+    ExerciseTrackerTheme {
+        ExerciseAddDialog(
+            onAcceptRequest = {},
+            onDismissRequest = {}
+        )
     }
 }

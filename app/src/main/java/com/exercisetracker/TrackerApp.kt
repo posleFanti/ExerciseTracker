@@ -130,3 +130,14 @@ fun BottomNavBarPreview() {
         BottomNavBar(rememberNavController())
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun TopAppBarPreview() {
+    ExerciseTrackerTheme {
+        TopAppBar(
+            title = "Title",
+            canNavigateBack = true
+        )
+    }
+}
