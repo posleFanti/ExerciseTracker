@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.data.entities.Exercise
+import com.exercisetracker.data.repositories.ExerciseRepository
+import com.exercisetracker.data.repositories.SetRepository
 import com.exercisetracker.data.repositories.WorkoutRepository
 import com.exercisetracker.ui.workouts.trackerApplication
 import kotlinx.coroutines.flow.debounce
@@ -21,7 +23,8 @@ import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 
 class ExerciseSearchViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val exerciseRepository: ExerciseRepository,
+    private val setRepository: SetRepository
 ) : ViewModel() {
 
     private val _searchQuery = mutableStateOf("")
@@ -37,9 +40,9 @@ class ExerciseSearchViewModel(
                 .distinctUntilChanged()
                 .flatMapLatest { query ->
                     if (query.isBlank()) {
-                        workoutRepository.getAllExercises()
+                        exerciseRepository.getAllExercises()
                     } else {
-                        workoutRepository.searchExercisesFlow("%$query%")
+                        exerciseRepository.searchExercisesFlow("%$query%")
                     }
                 }
                 .collect { exercises ->
@@ -53,21 +56,21 @@ class ExerciseSearchViewModel(
     }
 
     suspend fun addExercise(exercise: Exercise) {
-        workoutRepository.insertExercise(exercise)
+        exerciseRepository.insertExercise(exercise)
         if (_searchQuery.value.isBlank()) {
-            _searchResults.value = workoutRepository.getAllExercises().first()
+            _searchResults.value = exerciseRepository.getAllExercises().first()
         }
     }
 
     suspend fun deleteExercise(exercise: Exercise) {
-        val sets = workoutRepository.getAllSets(exerciseId = exercise.exerciseId)
+        val sets = setRepository.getAllSets(exerciseId = exercise.exerciseId)
             .filterNotNull()
             .first()
         sets.forEach { set ->
-            workoutRepository.deleteSet(set)
+            setRepository.deleteSet(set)
         }
 
-        workoutRepository.deleteExercise(exercise)
+        exerciseRepository.deleteExercise(exercise)
     }
 
     companion object {
@@ -75,7 +78,8 @@ class ExerciseSearchViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 ExerciseSearchViewModel(
-                    workoutRepository = trackerApplication().container.workoutRepository
+                    exerciseRepository = trackerApplication().container.exerciseRepository,
+                    setRepository = trackerApplication().container.setRepository
                 )
             }
         }

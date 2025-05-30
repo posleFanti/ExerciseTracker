@@ -37,12 +37,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ExerciseTrackerTheme {
-               Surface (
-                   modifier = Modifier.fillMaxSize(),
-                   color = MaterialTheme.colorScheme.background
-               ){
-                   TrackerApp()
-               }
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    TrackerApp()
+                }
             }
         }
     }

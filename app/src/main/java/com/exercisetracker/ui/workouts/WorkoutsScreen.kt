@@ -78,11 +78,13 @@ fun WorkoutScreen(
     val workoutsUiState by viewModel.workoutsUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold (
-        topBar = { TopAppBar(
-            title = stringResource(R.string.workouts_title),
-            canNavigateBack = false,
-        ) },
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(R.string.workouts_title),
+                canNavigateBack = false,
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, "Add")
@@ -104,7 +106,7 @@ fun WorkoutScreen(
         WorkoutAddDialog(
             onAcceptRequest = { name, type, date ->
                 coroutineScope.launch {
-                    viewModel.addWorkout(Workout(name = name,type = type, date = date))
+                    viewModel.addWorkout(Workout(name = name, type = type, date = date))
                     showAddDialog = false
                 }
             },
@@ -200,13 +202,15 @@ private fun WorkoutItem(
     val haptics = LocalHapticFeedback.current
 
     ElevatedCard(
-        modifier = modifier.fillMaxWidth().combinedClickable(
-            onClick = { toWorkoutDetails(workout.workoutId) },
-            onLongClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                onWorkoutLongClick(workout)
-            }
-        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = { toWorkoutDetails(workout.workoutId) },
+                onLongClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onWorkoutLongClick(workout)
+                }
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
     ) {
         Row(
@@ -250,7 +254,7 @@ private fun WorkoutAddDialog(
     Dialog(
         onDismissRequest = onDismissRequest,
     ) {
-        Card (
+        Card(
             modifier = modifier
                 .fillMaxWidth()
                 .height(285.dp)
@@ -279,16 +283,20 @@ private fun WorkoutAddDialog(
                 maxLines = 1,
                 modifier = modifier.padding(10.dp),
             )
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier.padding(horizontal = 10.dp)
-            ){
+            ) {
                 TextButton(
                     onClick = {
                         if (workoutName.isNotBlank() && workoutType.isNotBlank())
-                            onAcceptRequest(workoutName, workoutType, LocalDate.now().format(formatter))
-                        },
+                            onAcceptRequest(
+                                workoutName,
+                                workoutType,
+                                LocalDate.now().format(formatter)
+                            )
+                    },
                 ) { Text("Добавить") }
                 Spacer(modifier.weight(1f))
                 TextButton(
@@ -314,17 +322,17 @@ private fun WorkoutEditDialog(
     Dialog(
         onDismissRequest = onDismissRequest,
     ) {
-        Card (
+        Card(
             modifier = modifier
                 .fillMaxWidth()
                 .height(365.dp)
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(20.dp),
         ) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(top=7.dp)
+                modifier = Modifier.padding(top = 7.dp)
             ) {
                 Text(
                     text = "Изменить тренировку",
@@ -362,14 +370,14 @@ private fun WorkoutEditDialog(
                 maxLines = 1,
                 modifier = modifier.padding(10.dp),
             )
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier.padding(horizontal = 10.dp)
-            ){
+            ) {
                 TextButton(
                     onClick = {
-                       onAcceptRequest(workoutName, workoutType, workoutDate)
+                        onAcceptRequest(workoutName, workoutType, workoutDate)
                     },
                 ) { Text("Сохранить") }
                 Spacer(modifier.weight(1f))
@@ -414,6 +422,11 @@ fun WorkoutAddDialogPreview() {
 @Composable
 fun WorkoutEditDialogPreview() {
     ExerciseTrackerTheme {
-        WorkoutEditDialog(onAcceptRequest = { _, _, _ -> }, onDismissRequest = {}, { _ -> }, workout = Workout(0, "Название", "Кардио", "2025-05-10"))
+        WorkoutEditDialog(
+            onAcceptRequest = { _, _, _ -> },
+            onDismissRequest = {},
+            { _ -> },
+            workout = Workout(0, "Название", "Кардио", "2025-05-10")
+        )
     }
 }

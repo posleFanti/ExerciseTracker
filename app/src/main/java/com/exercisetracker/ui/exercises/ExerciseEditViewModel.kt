@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.data.entities.Exercise
+import com.exercisetracker.data.repositories.ExerciseRepository
 import com.exercisetracker.data.repositories.WorkoutRepository
 import com.exercisetracker.ui.workouts.trackerApplication
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,16 +23,17 @@ import java.io.ByteArrayOutputStream
 
 class ExerciseEditViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository
-): ViewModel() {
-    private val exerciseId: Long = checkNotNull(savedStateHandle[ExerciseEditDestination.exerciseIdArg])
+    private val exerciseRepository: ExerciseRepository
+) : ViewModel() {
+    private val exerciseId: Long =
+        checkNotNull(savedStateHandle[ExerciseEditDestination.exerciseIdArg])
 
     var exerciseUiState by mutableStateOf(ExerciseUiState())
         private set
 
     init {
         viewModelScope.launch {
-            exerciseUiState = workoutRepository.getExercise(exerciseId)
+            exerciseUiState = exerciseRepository.getExercise(exerciseId)
                 .filterNotNull()
                 .first()
                 .toExerciseUiState()
@@ -62,16 +64,15 @@ class ExerciseEditViewModel(
     }
 
     suspend fun updateExercise() {
-        workoutRepository.updateExercise(exerciseUiState.exerciseDetails.toExercise())
+        exerciseRepository.updateExercise(exerciseUiState.exerciseDetails.toExercise())
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 ExerciseEditViewModel(
                     savedStateHandle = this.createSavedStateHandle(),
-                    workoutRepository = trackerApplication().container.workoutRepository
+                    exerciseRepository = trackerApplication().container.exerciseRepository
                 )
             }
         }
@@ -88,11 +89,13 @@ data class ExerciseUiState(
     val exerciseDetails: ExerciseDetails = ExerciseDetails()
 )
 
-fun Exercise.toExerciseUiState(): ExerciseUiState = ExerciseUiState(ExerciseDetails(
-    exerciseId = this.exerciseId,
-    name = this.name,
-    image = image
-))
+fun Exercise.toExerciseUiState(): ExerciseUiState = ExerciseUiState(
+    ExerciseDetails(
+        exerciseId = this.exerciseId,
+        name = this.name,
+        image = image
+    )
+)
 
 fun ExerciseDetails.toExercise(): Exercise = Exercise(
     exerciseId = this.exerciseId,

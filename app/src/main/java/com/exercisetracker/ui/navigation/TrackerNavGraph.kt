@@ -22,7 +22,7 @@ import com.exercisetracker.ui.workouts.WorkoutScreen
 import com.exercisetracker.ui.workouts.WorkoutsDestination
 
 @Composable
-fun TrackerNavHost (
+fun TrackerNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {

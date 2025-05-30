@@ -17,6 +17,8 @@ import com.exercisetracker.data.entities.ExerciseWithSetsView
 import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.data.entities.WorkoutWithExercisesWithSets
 import com.exercisetracker.data.entities.Set
+import com.exercisetracker.data.repositories.ExerciseRepository
+import com.exercisetracker.data.repositories.SetRepository
 import com.exercisetracker.data.repositories.WorkoutRepository
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -26,9 +28,12 @@ import kotlinx.coroutines.launch
 
 class WorkoutDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository
-): ViewModel() {
-    private val workoutId: Long = checkNotNull(savedStateHandle[WorkoutDetailsDestination.workoutIdArg])
+    private val workoutRepository: WorkoutRepository,
+    private val exerciseRepository: ExerciseRepository,
+    private val setRepository: SetRepository
+) : ViewModel() {
+    private val workoutId: Long =
+        checkNotNull(savedStateHandle[WorkoutDetailsDestination.workoutIdArg])
 
     var uiState by mutableStateOf(WorkoutDetailsUiState())
         private set
@@ -53,11 +58,11 @@ class WorkoutDetailsViewModel(
                 .distinctUntilChanged()
                 .collect { query ->
                     _searchResults.value = if (query.isBlank()) {
-                        workoutRepository.getAllExercises()
+                        exerciseRepository.getAllExercises()
                             .filterNotNull()
                             .first()
                     } else {
-                        workoutRepository.searchExercisesFlow("%$query%")
+                        exerciseRepository.searchExercisesFlow("%$query%")
                             .filterNotNull().first()
                     }
                 }
@@ -74,12 +79,12 @@ class WorkoutDetailsViewModel(
             reps = 0
         )
 
-        workoutRepository.insertSet(newSet)
+        setRepository.insertSet(newSet)
     }
 
     suspend fun deleteExercise(exerciseWithSets: ExerciseWithSets) {
         exerciseWithSets.sets.forEach { set ->
-            workoutRepository.deleteSet(set)
+            setRepository.deleteSet(set)
         }
     }
 
@@ -88,12 +93,13 @@ class WorkoutDetailsViewModel(
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 WorkoutDetailsViewModel(
                     this.createSavedStateHandle(),
-                    workoutRepository = trackerApplication().container.workoutRepository
+                    workoutRepository = trackerApplication().container.workoutRepository,
+                    exerciseRepository = trackerApplication().container.exerciseRepository,
+                    setRepository = trackerApplication().container.setRepository
                 )
             }
         }
@@ -110,15 +116,16 @@ data class ExerciseWithSets(
     val sets: List<Set>
 )
 
-fun WorkoutWithExercisesWithSets.toWorkoutDetailsUiState(): WorkoutDetailsUiState = WorkoutDetailsUiState(
-    workout = workout,
-    exercisesWithSets = groupExercisesWithSets(exercisesWithSets)
-)
+fun WorkoutWithExercisesWithSets.toWorkoutDetailsUiState(): WorkoutDetailsUiState =
+    WorkoutDetailsUiState(
+        workout = workout,
+        exercisesWithSets = groupExercisesWithSets(exercisesWithSets)
+    )
 
 fun groupExercisesWithSets(views: List<ExerciseWithSetsView>): List<ExerciseWithSets> {
     return views
         .groupBy { it.exercise.exerciseId }
-        .map { (exerciseId, setsViews) ->
+        .map { (_, setsViews) ->
             ExerciseWithSets(
                 exercise = setsViews.first().exercise,
                 sets = setsViews.map {

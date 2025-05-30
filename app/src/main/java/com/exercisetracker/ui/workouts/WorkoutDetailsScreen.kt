@@ -87,9 +87,11 @@ fun WorkoutDetailsScreen(
         Column {
             DetailsBody(
                 navigateToEditWorkout = navigateToEditWorkout,
-                doneExerciseDelete = { coroutineScope.launch {
-                    viewModel.deleteExercise(it)
-                } },
+                doneExerciseDelete = {
+                    coroutineScope.launch {
+                        viewModel.deleteExercise(it)
+                    }
+                },
                 exerciseList = exerciseList,
                 modifier = modifier.padding(innerPadding)
             )

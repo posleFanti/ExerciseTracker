@@ -9,32 +9,35 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.data.entities.Exercise
 import com.exercisetracker.data.entities.ExerciseWithSetsView
 import com.exercisetracker.data.entities.Set
-import com.exercisetracker.data.repositories.WorkoutRepository
+import com.exercisetracker.data.repositories.ExerciseRepository
+import com.exercisetracker.data.repositories.SetRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class DoneExerciseEditViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository,
-): ViewModel() {
-    private val workoutId: Long = checkNotNull(savedStateHandle[DoneExerciseEditDestination.workoutIdArg])
-    private val exerciseId: Long = checkNotNull(savedStateHandle[DoneExerciseEditDestination.exerciseIdArg])
+    private val exerciseRepository: ExerciseRepository,
+    private val setRepository: SetRepository
+) : ViewModel() {
+    private val workoutId: Long =
+        checkNotNull(savedStateHandle[DoneExerciseEditDestination.workoutIdArg])
+    private val exerciseId: Long =
+        checkNotNull(savedStateHandle[DoneExerciseEditDestination.exerciseIdArg])
 
     var doneExerciseEditUiState by mutableStateOf(DoneExerciseEditUiState())
         private set
 
     init {
         viewModelScope.launch {
-            doneExerciseEditUiState = workoutRepository.getExerciseWithSetsView(workoutId, exerciseId)
-                .toDoneExerciseEditUiState(true)
+            doneExerciseEditUiState =
+                exerciseRepository.getExerciseWithSetsView(workoutId, exerciseId)
+                    .toDoneExerciseEditUiState(true)
         }
     }
 
@@ -58,7 +61,8 @@ class DoneExerciseEditViewModel(
     }
 
     fun addSet() {
-        val currentSets = doneExerciseEditUiState.doneExerciseDetails.sets.map { set -> set.toSet() }
+        val currentSets =
+            doneExerciseEditUiState.doneExerciseDetails.sets.map { set -> set.toSet() }
         val lastSet = currentSets.lastOrNull()
 
         val newSetNumber = (lastSet?.setNumber ?: 0) + 1
@@ -83,7 +87,8 @@ class DoneExerciseEditViewModel(
     }
 
     fun removeSet(setNumber: Int) {
-        val currentSets = doneExerciseEditUiState.doneExerciseDetails.sets.map { set -> set.toSet() }
+        val currentSets =
+            doneExerciseEditUiState.doneExerciseDetails.sets.map { set -> set.toSet() }
 
         // Удаляем подход с указанным номером
         val filteredSets = currentSets.filterNot { it.setNumber == setNumber }
@@ -108,35 +113,37 @@ class DoneExerciseEditViewModel(
             val details = doneExerciseEditUiState.doneExerciseDetails
 
             // Обновляем упражнение
-            workoutRepository.updateExercise(details.exercise.toExercise())
+            exerciseRepository.updateExercise(details.exercise.toExercise())
             Log.d("ViewModel", "exerciseId: $exerciseId, workoutId: $workoutId")
 
             // Получаем текущие подходы из базы данных
-            val existingSets = workoutRepository.getSets(workoutId, exerciseId)
+            val existingSets = setRepository.getSets(workoutId, exerciseId)
                 .filterNotNull()
                 .first()
 
-            workoutRepository.runInTransaction {
+            setRepository.runInTransaction {
                 // Удаляем все существующие подходы
                 existingSets.forEach { set ->
-                    workoutRepository.deleteSet(set)
+                    setRepository.deleteSet(set)
                 }
 
                 // Добавляем все новые подходы
                 details.sets.forEach { set ->
-                    workoutRepository.insertSet(set.copy(setId=0).toSet()) // Сбрасываем ID для создания нового
+                    setRepository.insertSet(
+                        set.copy(setId = 0).toSet()
+                    ) // Сбрасываем ID для создания нового
                 }
             }
         }
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 DoneExerciseEditViewModel(
                     this.createSavedStateHandle(),
-                    workoutRepository = trackerApplication().container.workoutRepository,
+                    exerciseRepository = trackerApplication().container.exerciseRepository,
+                    setRepository = trackerApplication().container.setRepository
                 )
             }
         }

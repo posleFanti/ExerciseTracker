@@ -58,13 +58,13 @@ data class ExerciseWithSetsView(
     @Embedded
     val exercise: Exercise,
 
-    @ColumnInfo(name="set_id")
+    @ColumnInfo(name = "set_id")
     val setId: Long,
 
-    @ColumnInfo(name="workout_id")
+    @ColumnInfo(name = "workout_id")
     val workoutId: Long,
 
-    @ColumnInfo(name="set_number")
+    @ColumnInfo(name = "set_number")
     val setNumber: Int,
 
     val weight: Double,

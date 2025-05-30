@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.exercisetracker.TrackerApplication
 import com.exercisetracker.data.entities.Workout
+import com.exercisetracker.data.repositories.SetRepository
 import com.exercisetracker.data.repositories.WorkoutRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class WorkoutsViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val workoutRepository: WorkoutRepository,
+    private val setRepository: SetRepository
 ) : ViewModel() {
     val workoutsUiState: StateFlow<WorkoutsUiState> =
         workoutRepository.getAllWorkoutsStream().map { WorkoutsUiState(it) }
@@ -37,13 +39,13 @@ class WorkoutsViewModel(
     }
 
     suspend fun deleteWorkout(workout: Workout) {
-        workoutRepository.runInTransaction {
-            workoutRepository.getSetsByWorkoutId(workout.workoutId).filterNotNull().first().forEach { set ->
-                workoutRepository.deleteSet(set)
-            }
+        setRepository.runInTransaction {
+            setRepository.getSetsByWorkoutId(workout.workoutId).filterNotNull().first()
+                .forEach { set ->
+                    setRepository.deleteSet(set)
+                }
+            workoutRepository.deleteWorkout(workout)
         }
-
-        workoutRepository.deleteWorkout(workout)
     }
 
     companion object {
@@ -51,7 +53,8 @@ class WorkoutsViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 WorkoutsViewModel(
-                    workoutRepository = trackerApplication().container.workoutRepository
+                    workoutRepository = trackerApplication().container.workoutRepository,
+                    setRepository = trackerApplication().container.setRepository
                 )
             }
         }

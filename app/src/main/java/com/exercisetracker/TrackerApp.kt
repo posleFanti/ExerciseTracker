@@ -31,12 +31,15 @@ import com.exercisetracker.ui.workouts.WorkoutsDestination
 
 @Composable
 fun TrackerApp(navController: NavHostController = rememberNavController()) {
-    Scaffold (
+    Scaffold(
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
-            if (currentRoute in listOf(WorkoutsDestination.route, ExercisesDestination.route,
-                    StatsDestination.route)) {
+            if (currentRoute in listOf(
+                    WorkoutsDestination.route, ExercisesDestination.route,
+                    StatsDestination.route
+                )
+            ) {
                 BottomNavBar(navController)
             }
         }

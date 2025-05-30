@@ -160,7 +160,7 @@ fun ExerciseCard(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(

@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.exercisetracker.data.entities.Exercise
+import com.exercisetracker.data.entities.ExerciseWithSetsView
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,6 +30,13 @@ interface ExerciseDao {
 
     @Query("SELECT * FROM exercises WHERE exercise_name LIKE :query")
     fun searchExercisesFlow(query: String): Flow<List<Exercise>>
+
+    @Transaction
+    @Query("SELECT * FROM ExerciseWithSetsView WHERE exercise_id = :exerciseId AND workout_id = :workoutId ORDER BY set_number ASC")
+    suspend fun getExerciseWithSetsView(
+        workoutId: Long,
+        exerciseId: Long
+    ): List<ExerciseWithSetsView>
 
     /*@Transaction
     @Query("SELECT * FROM exercises WHERE exercise_id = :id")

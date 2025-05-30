@@ -1,12 +1,6 @@
 package com.exercisetracker.data.repositories
 
-import com.exercisetracker.data.dao.ExerciseDao
-import com.exercisetracker.data.dao.SetDao
 import com.exercisetracker.data.dao.WorkoutDao
-import com.exercisetracker.data.entities.DateMaxWeight
-import com.exercisetracker.data.entities.Exercise
-import com.exercisetracker.data.entities.ExerciseWithSetsView
-import com.exercisetracker.data.entities.Set
 import com.exercisetracker.data.entities.Workout
 import com.exercisetracker.data.entities.WorkoutWithExercisesWithSets
 import kotlinx.coroutines.Dispatchers
@@ -15,75 +9,24 @@ import kotlinx.coroutines.withContext
 
 class OfflineWorkoutRepository(
     private val workoutDao: WorkoutDao,
-    private val exerciseDao: ExerciseDao,
-    private val setDao: SetDao
 ) : WorkoutRepository {
     override fun getAllWorkoutsStream(): Flow<List<Workout>> =
         workoutDao.getAllWorkouts()
 
-    /*override fun getWorkoutWithExercisesStream(id: Long): Flow<WorkoutWithExercises?> =
-        workoutDao.getWorkoutWithExercises(id)*/
-
     override fun getWorkoutStream(id: Long): Flow<Workout?> =
         workoutDao.getWorkout(id)
-
-    override fun getSetsByWorkoutId(workoutId: Long): Flow<List<Set>> =
-        setDao.getSetsByWorkoutId(workoutId)
-
-    override fun getSets(
-        workoutId: Long,
-        exerciseId: Long
-    ): Flow<List<Set>?> = setDao.getSets(workoutId, exerciseId)
-
-    override fun getAllSets(exerciseId: Long): Flow<List<Set>> =
-        setDao.getSetsByExerciseId(exerciseId)
-
-    override fun getAllExercises(): Flow<List<Exercise>> =
-        exerciseDao.getAllExercises()
-
-    override fun getExercise(exerciseId: Long): Flow<Exercise> =
-        exerciseDao.getExerciseById(exerciseId)
-
-    override fun getExerciseStats(exerciseId: Long): Flow<List<DateMaxWeight>> =
-        setDao.getExerciseStats(exerciseId)
 
     override suspend fun getWorkoutWithExercisesWithSets(workoutId: Long): Flow<WorkoutWithExercisesWithSets> =
         workoutDao.getWorkoutWithExercisesAndSets(workoutId)
 
-    override suspend fun getExerciseWithSetsView(
-        workoutId: Long,
-        exerciseId: Long
-    ): List<ExerciseWithSetsView> = workoutDao.getExerciseWithSetsView(workoutId, exerciseId)
-
     override suspend fun insertWorkout(workout: Workout) =
         workoutDao.insert(workout)
-
-    override suspend fun insertSet(set: Set): Long =
-        setDao.insert(set)
-
-    override suspend fun insertExercise(exercise: Exercise) =
-        exerciseDao.insert(exercise)
 
     override suspend fun deleteWorkout(workout: Workout) =
         workoutDao.delete(workout)
 
-    override suspend fun deleteSet(set: Set) =
-        setDao.delete(set)
-
-    override suspend fun deleteExercise(exercise: Exercise) =
-        exerciseDao.delete(exercise)
-
     override suspend fun updateWorkout(workout: Workout) =
         workoutDao.update(workout)
-
-    override suspend fun updateExercise(exercise: Exercise) =
-        exerciseDao.update(exercise)
-
-    override suspend fun updateSet(set: Set) =
-        setDao.update(set)
-
-    override suspend fun searchExercisesFlow(query: String): Flow<List<Exercise>> =
-        exerciseDao.searchExercisesFlow(query)
 
     override suspend fun runInTransaction(block: suspend () -> Unit) {
         withContext(Dispatchers.IO) {

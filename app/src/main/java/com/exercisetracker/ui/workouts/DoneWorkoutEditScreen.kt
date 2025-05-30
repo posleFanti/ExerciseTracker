@@ -124,13 +124,13 @@ private fun SetsInputForm(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items = uiState.doneExerciseDetails.sets, key = { it.setNumber }) { item ->
-           InputRow(
+            InputRow(
                 setNumber = item.setNumber.toInt(),
                 onRemoveSet = onRemoveSet,
                 doneExerciseDetails = uiState.doneExerciseDetails,
                 onValueChange = onValueChange,
                 modifier = Modifier.fillMaxWidth()
-           )
+            )
         }
     }
 }
@@ -149,16 +149,36 @@ private fun InputRow(
     ) {
         Text(text = setNumber.toString(), modifier = Modifier.padding(10.dp))
         OutlinedTextField(
-            value = doneExerciseDetails.sets[setNumber-1].reps.toString(),
-            onValueChange = { onValueChange(doneExerciseDetails.copy(sets = changeReps(it, doneExerciseDetails.sets, setNumber))) },
-            label = { Text(text="Кол-во повторений") },
+            value = doneExerciseDetails.sets[setNumber - 1].reps.toString(),
+            onValueChange = {
+                onValueChange(
+                    doneExerciseDetails.copy(
+                        sets = changeReps(
+                            it,
+                            doneExerciseDetails.sets,
+                            setNumber
+                        )
+                    )
+                )
+            },
+            label = { Text(text = "Кол-во повторений") },
             singleLine = true,
             modifier = Modifier.width(150.dp)
         )
         Spacer(Modifier.size(20.dp))
         OutlinedTextField(
-            value = doneExerciseDetails.sets[setNumber-1].weight.toString(),
-            onValueChange = { onValueChange(doneExerciseDetails.copy(sets = changeWeight(it, doneExerciseDetails.sets, setNumber)))},
+            value = doneExerciseDetails.sets[setNumber - 1].weight.toString(),
+            onValueChange = {
+                onValueChange(
+                    doneExerciseDetails.copy(
+                        sets = changeWeight(
+                            it,
+                            doneExerciseDetails.sets,
+                            setNumber
+                        )
+                    )
+                )
+            },
             label = { Text(text = "Вес") },
             singleLine = true,
             modifier = Modifier.width(150.dp)
@@ -175,7 +195,11 @@ private fun changeReps(newValue: String, sets: List<SetDetails>, setNumber: Int)
     }
 }
 
-private fun changeWeight(newValue: String, sets: List<SetDetails>, setNumber: Int): List<SetDetails> {
+private fun changeWeight(
+    newValue: String,
+    sets: List<SetDetails>,
+    setNumber: Int
+): List<SetDetails> {
     return sets.map { item ->
         if (item.setNumber.toInt() == setNumber) item.copy(weight = newValue) else item
     }
@@ -190,7 +214,7 @@ fun InputRowPreview() {
             setNumber = 1,
             onRemoveSet = {},
             doneExerciseDetails = DoneExerciseDetails(
-                sets = listOf(Set(0,0,0,1,27.4,10).toSetDetails())
+                sets = listOf(Set(0, 0, 0, 1, 27.4, 10).toSetDetails())
             ),
             onValueChange = { _ -> },
         )

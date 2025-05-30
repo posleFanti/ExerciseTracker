@@ -41,19 +41,23 @@ object StatsDestination : NavigationDestination {
 fun StatsScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = viewModel(factory = StatsViewModel.Factory)
-){
-    Scaffold (
-        topBar = { TopAppBar(
-            title = stringResource(R.string.stats_screen),
-            canNavigateBack = false,
-        ) },
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(R.string.stats_screen),
+                canNavigateBack = false,
+            )
+        },
     ) { innerPadding ->
         val searchQuery by viewModel.searchQuery
         val chartData by viewModel.chartData
         val exercises by viewModel.searchResults
         val isSearchActive by viewModel.isSearchActive
 
-        Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .padding(16.dp)) {
             SearchBar(
                 query = searchQuery,
                 onQueryChange = viewModel::onSearchQueryChanged,

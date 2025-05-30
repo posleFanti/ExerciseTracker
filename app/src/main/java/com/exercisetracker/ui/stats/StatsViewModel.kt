@@ -19,7 +19,7 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.LineType
 import com.exercisetracker.data.entities.DateMaxWeight
 import com.exercisetracker.data.entities.Exercise
-import com.exercisetracker.data.repositories.WorkoutRepository
+import com.exercisetracker.data.repositories.ExerciseRepository
 import com.exercisetracker.ui.workouts.trackerApplication
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -28,8 +28,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class StatsViewModel(
-    private val workoutRepository: WorkoutRepository
-): ViewModel() {
+    private val exerciseRepository: ExerciseRepository
+) : ViewModel() {
     private val _searchQuery = mutableStateOf("")
     val searchQuery: State<String> = _searchQuery
 
@@ -52,7 +52,7 @@ class StatsViewModel(
                 .distinctUntilChanged()
                 .collect { query ->
                     _searchResults.value = if (query.isBlank()) emptyList()
-                    else workoutRepository.searchExercisesFlow("%$query%").filterNotNull().first()
+                    else exerciseRepository.searchExercisesFlow("%$query%").filterNotNull().first()
                 }
         }
     }
@@ -74,7 +74,7 @@ class StatsViewModel(
         _isSearchActive.value = false
 
         viewModelScope.launch {
-            workoutRepository.getExerciseStats(exercise.exerciseId)
+            exerciseRepository.getExerciseStats(exercise.exerciseId)
                 .collect { stats ->
                     _chartData.value = if (stats.isNotEmpty()) convertToChartData(stats) else null
                 }
@@ -141,11 +141,10 @@ class StatsViewModel(
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 StatsViewModel(
-                    workoutRepository = trackerApplication().container.workoutRepository
+                    exerciseRepository = trackerApplication().container.exerciseRepository
                 )
             }
         }

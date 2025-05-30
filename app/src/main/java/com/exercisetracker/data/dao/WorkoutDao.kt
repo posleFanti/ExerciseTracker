@@ -35,8 +35,10 @@ interface WorkoutDao {
 
     @Transaction
     @Query("SELECT * FROM ExerciseWithSetsView WHERE exercise_id = :exerciseId AND workout_id = :workoutId ORDER BY set_number ASC")
-    suspend fun getExerciseWithSetsView(workoutId: Long, exerciseId: Long): List<ExerciseWithSetsView>
-
+    suspend fun getExerciseWithSetsView(
+        workoutId: Long,
+        exerciseId: Long
+    ): List<ExerciseWithSetsView>
 
     @Transaction
     suspend fun runInTransaction(block: suspend () -> Unit) {
