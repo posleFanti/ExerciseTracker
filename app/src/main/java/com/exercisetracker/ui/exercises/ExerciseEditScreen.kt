@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Clear
@@ -111,7 +113,7 @@ private fun ExerciseEditBody(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier.padding(16.dp)
+        modifier = modifier.padding(16.dp).verticalScroll(rememberScrollState())
     ) {
         ExerciseEditForm(
             exerciseDetails = exerciseUiState.exerciseDetails,
@@ -176,7 +178,6 @@ private fun ExerciseEditForm(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
                 .clickable {
                     imagePickerLauncher.launch("image/*")
                 },
@@ -186,15 +187,15 @@ private fun ExerciseEditForm(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 exerciseDetails.image?.let { imageByteArray ->
                     val bitmap = imageByteArray.toBitmap()
                     bitmap?.let { bmp ->
+                        val ratio = bmp.width.toFloat() / bmp.height.toFloat()
                         Box (
-                            modifier = Modifier.height(400.dp),
+                            //modifier = Modifier.height(400.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
@@ -202,7 +203,7 @@ private fun ExerciseEditForm(
                                 contentDescription = "Фото тренажера",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(400.dp)
+                                    .aspectRatio(ratio)
                                     .clip(RoundedCornerShape(8.dp)),
                                 contentScale = ContentScale.Crop
                             )
@@ -221,7 +222,8 @@ private fun ExerciseEditForm(
                 } ?: run {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddCircle,
