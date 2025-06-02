@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -175,7 +176,7 @@ private fun ExerciseEditForm(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(400.dp)
                 .clickable {
                     imagePickerLauncher.launch("image/*")
                 },
@@ -186,21 +187,24 @@ private fun ExerciseEditForm(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(400.dp),
                 contentAlignment = Alignment.Center
             ) {
                 exerciseDetails.image?.let { imageByteArray ->
                     val bitmap = imageByteArray.toBitmap()
                     bitmap?.let { bmp ->
-                        Box {
+                        Box (
+                            modifier = Modifier.height(400.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Image(
                                 bitmap = bmp.asImageBitmap(),
                                 contentDescription = "Фото тренажера",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .aspectRatio(16f / 9f)
+                                    .height(400.dp)
                                     .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.FillHeight
+                                contentScale = ContentScale.Crop
                             )
                             IconButton(
                                 onClick = onImageClear,
@@ -235,5 +239,20 @@ private fun ExerciseEditForm(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExerciseEditFormPreview() {
+    ExerciseTrackerTheme {
+        ExerciseEditForm(
+            onValueChange = {},
+            onImageClear = {},
+            onImageUpdate = {},
+            exerciseDetails = ExerciseDetails(
+                name = "Название упражнения",
+            )
+        )
     }
 }
